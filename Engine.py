@@ -1,6 +1,6 @@
 import math
 import Moon, Spaceship, Configuration
-
+from Constants import *
 class Engine():
     '''
     This class represents the engine, which calculates the changes to the spaceship
@@ -8,7 +8,6 @@ class Engine():
     '''
 
     def __init__(self, config : Configuration):
-        self.dt = config.dt
         self.all_burn = config.ALL_BURN
         self.weight_emp = config.WEIGHT_EMP
 
@@ -25,18 +24,20 @@ class Engine():
         ans = t / weight
         return ans
     
-    def main_calc(self, ship : Spaceship):
-        # main computations
-        ang_rad = math.radians(ship.ang)
+    def main_calc(self, dt, ship : Spaceship):
+        # temps
+        ang_rad = math.radians(ship.config.ang)
         h_acc = math.sin(ang_rad) * acc
         v_acc = math.cos(ang_rad) * acc
         vacc = Moon.getAcc(hs)
-        time += self.dt
-        dw =self. dt * self.all_burn * ship.NN
-        if fuel > 0:
-            fuel -= dw
+        time += dt
+        dw = dt * self.all_burn * ship.config.NN
+        fuel = None
+        acc = None
+        if ship.config.fuel > 0:
+            fuel = ship.config.fuel - dw
             weight = self.weight_emp + fuel
-            acc = ship.NN * self.accMax(weight)
+            acc = ship.config.NN * self.accMax(weight)
         else:  # ran out of fuel
             acc = 0
         v_acc -= vacc
@@ -45,6 +46,8 @@ class Engine():
         dist -= hs * self.dt
         vs -= v_acc * self.dt
         alt -= self.dt * vs
+
+        ship.config.update(dist = dist, vs = vs, hs = hs, acc = acc, alt = alt, fuel = fuel)
         
 
             
