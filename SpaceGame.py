@@ -5,6 +5,7 @@ from Configuration import Configuration
 from Spaceship import Spaceship
 
 # Constants
+# TODO: add arrow constants + comparisons 
 UP = K_w
 DOWN = K_s
 LEFT = K_a

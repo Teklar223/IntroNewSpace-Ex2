@@ -42,7 +42,7 @@ class Spaceship(pygame.sprite.Sprite):
         self.config.angle = (self.config.angle - 3) % 360
 
     def update(self, dt, width, height):
-
+        # TODO: update via engine
         keys = pygame.key.get_pressed()
         if keys[UP]:
             self.rect.y -= 1 # self.config.vs * dt

@@ -2,6 +2,7 @@ from SpaceGame import SpaceGame
 
 def main():
     '''
+        lazy start
     '''
     game = SpaceGame()
     game.start()
