@@ -46,7 +46,7 @@ class SpaceGame:
 
             self.ship.update(dt, self.screen.get_width(), self.screen.get_height())
 
-            self.screen.fill((0, 0, 0))
+            self.screen.fill((255, 255, 255))
             self.screen.blit(self.ship.image, self.ship.rect)
             pygame.display.flip()
 
