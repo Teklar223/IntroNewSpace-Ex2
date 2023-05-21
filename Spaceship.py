@@ -37,31 +37,37 @@ class Spaceship(pygame.sprite.Sprite):
     
     def left_fun(self):
         print("LEFT")
-        self.config.angle = (self.config.angle + 180) % 360 # (self.config.angle + 3) % 360
+        self.config.angle = (self.config.angle + 10) % 360 # (self.config.angle + 3) % 360
 
     def right_fun(self):
         print("RIGHT")
-        self.config.angle = (self.config.angle - 3) % 360
+        self.config.angle = (self.config.angle - 10) % 360
 
     def update(self, dt, width, height, engine : Engine):
-        # TODO: update via engine
-        '''
         keys = pygame.key.get_pressed()
-        if keys[UP]:
-            self.rect.y -= 1 # self.config.vs * dt
-        if keys[DOWN]:
-            self.rect.y += 1 # self.config.vs * dt
-        if keys[LEFT]:
-            self.rect.x -= 1 # self.config.hs * dt
-        if keys[RIGHT]:
-            self.rect.x += 1 # self.config.hs * dt
+        if keys[UP] or keys[K_UP]:
+            self.up_fun()
+        if keys[DOWN] or keys[K_DOWN]:
+            self.down_fun()
+        if keys[LEFT] or keys[K_LEFT]:
+            self.left_fun()
+        if keys[RIGHT] or keys[K_RIGHT]:
+            self.right_fun()
+        # calculate changes and update config
+        dist,vs,hs,acc,alt,fuel,weight = engine.main_calc(dt = dt, config = self.config)
+        self.config.update(dist = dist, vs = vs, hs = hs, acc = acc, alt = alt, fuel = fuel, dt = dt, weight = weight)
+        self.update_position(dt = dt)
+        self.ensure_bounds(width = width, height = height)
+
+    def update_position(self, dt):
+        config = self.config
+        self.rect.x += config.hs * dt
+        self.rect.y += config.vs * dt
+
+    def ensure_bounds(self, width, height):
         '''
-        dist,vs,hs,acc,alt,fuel = engine.main_calc(dt = dt, config = self.config)
-        self.config.update(dist = dist, vs = vs, hs = hs, acc = acc, alt = alt, fuel = fuel, dt = dt)
-        # Update x and y coordinates based on hs (horizontal speed) and vs (vertical speed)
-        self.rect.x += hs * dt
-        self.rect.y += vs * dt
-        # ensure ship stays within screen borders:
+            ensures ship stays within screen borders
+        '''
         if self.rect.left < 0:
             self.rect.left = 0
         if self.rect.right > width:

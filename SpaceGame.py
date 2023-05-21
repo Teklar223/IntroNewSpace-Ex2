@@ -4,6 +4,7 @@ from random import randint
 from Configuration import Configuration
 from Spaceship import Spaceship
 from Engine import Engine
+from Util import topg # to pygame (co-ordinates)
 
 # Constants
 # TODO: add arrow constants + comparisons 
@@ -16,9 +17,9 @@ class SpaceGame:
     '''
     This is the 'Controller' of our simulation
     '''
-    def __init__(self):
+    def __init__(self,width = 1600, height = 800):
         pygame.init()
-        self.screen = pygame.display.set_mode((800, 600))
+        self.screen = pygame.display.set_mode((width, height))
         self.clock = pygame.time.Clock()
         self.ship = None
 
@@ -27,6 +28,7 @@ class SpaceGame:
             if event.type == QUIT:
                 pygame.quit()
                 return False
+            '''
             elif event.type == KEYDOWN:
                 if event.key == UP:
                     self.ship.up_fun()
@@ -36,6 +38,7 @@ class SpaceGame:
                     self.ship.left_fun()
                 elif event.key == RIGHT:
                     self.ship.right_fun()
+            '''
 
         return True
     
@@ -53,12 +56,13 @@ class SpaceGame:
         self.startGame(config)
 
     def startGame(self, config):
-        self.ship = Spaceship(config,_x = self.screen.get_width()/2, _y = 0.9 * self.screen.get_height())
+        x,y = topg(self.screen.get_width()/2, 0.9 * self.screen.get_height(), self.screen.get_height())
+        self.ship = Spaceship(config,_x = x, _y = y)
         self.engine = Engine(config)
         running = True
 
         while running:
-            dt = self.clock.tick(60) / 1000.0
+            dt = self.clock.tick(60) / 100.0
             running = self._handle_events()
 
             self.ship.update(engine = self.engine, dt = dt, width = self.screen.get_width(), height = self.screen.get_height())

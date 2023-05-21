@@ -34,6 +34,7 @@ class Engine():
         dw = dt * self.all_burn * config.NN
         fuel = None
         acc = None
+        weight = None
         if config.fuel > 0:
             fuel = config.fuel - dw
             weight = self.weight_emp + fuel
@@ -48,7 +49,7 @@ class Engine():
         vs = config.vs - v_acc * dt
         alt = config.alt - dt * vs
 
-        return dist,vs,hs,acc,alt,fuel
+        return dist,vs,hs,acc,alt,fuel, weight
         
 
             
