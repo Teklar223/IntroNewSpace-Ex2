@@ -24,7 +24,9 @@ class Configuration():
         self.is_player = False
         self.time = 0
 
-    def update(self, vs = None, hs = None, dist = None, angle = None, alt = None, acc = None, fuel = None, weight = None, NN = None, is_player = None):
+    def update(self, dt = None, vs = None, hs = None, dist = None, angle = None, alt = None, acc = None, fuel = None, weight = None, NN = None, is_player = None):
+        if dt is not None:
+            self.time += dt # notice this rule is different!
         if vs is not None:
             self.vs = vs
         if hs is not None:

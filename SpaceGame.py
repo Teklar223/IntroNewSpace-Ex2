@@ -3,6 +3,7 @@ from pygame.locals import *
 from random import randint
 from Configuration import Configuration
 from Spaceship import Spaceship
+from Engine import Engine
 
 # Constants
 # TODO: add arrow constants + comparisons 
@@ -52,14 +53,15 @@ class SpaceGame:
         self.startGame(config)
 
     def startGame(self, config):
-        self.ship = Spaceship(config)
+        self.ship = Spaceship(config,_x = self.screen.get_width()/2, _y = 0.9 * self.screen.get_height())
+        self.engine = Engine(config)
         running = True
 
         while running:
             dt = self.clock.tick(60) / 1000.0
             running = self._handle_events()
 
-            self.ship.update(dt, self.screen.get_width(), self.screen.get_height())
+            self.ship.update(engine = self.engine, dt = dt, width = self.screen.get_width(), height = self.screen.get_height())
 
             self.screen.fill((255, 255, 255))
             self.screen.blit(self.ship.image, self.ship.rect)

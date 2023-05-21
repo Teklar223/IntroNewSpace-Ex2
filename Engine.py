@@ -3,13 +3,14 @@ import Moon, Spaceship, Configuration
 from Constants import *
 class Engine():
     '''
-    This class represents the engine, which calculates the changes to the spaceship
-    (similar to 'Model' in MVC)
+    This class represents the physics engine, which calculates the changes to the spaceships position
     '''
 
     def __init__(self, config : Configuration):
         self.all_burn = config.ALL_BURN
         self.weight_emp = config.WEIGHT_EMP
+        self.MAIN_ENG_F = 430  # N
+        self.SECOND_ENG_F = 25  # N
 
 
     def accMax(self, weight: float) -> float:
@@ -24,30 +25,30 @@ class Engine():
         ans = t / weight
         return ans
     
-    def main_calc(self, dt, ship : Spaceship):
+    def main_calc(self, dt, config : Configuration) :
         # temps
-        ang_rad = math.radians(ship.config.ang)
-        h_acc = math.sin(ang_rad) * acc
-        v_acc = math.cos(ang_rad) * acc
-        vacc = Moon.getAcc(hs)
-        time += dt
-        dw = dt * self.all_burn * ship.config.NN
+        ang_rad = math.radians(config.angle)
+        h_acc = math.sin(ang_rad) * config.acc
+        v_acc = math.cos(ang_rad) * config.acc
+        vacc = Moon.getAcc(config.hs)
+        dw = dt * self.all_burn * config.NN
         fuel = None
         acc = None
-        if ship.config.fuel > 0:
-            fuel = ship.config.fuel - dw
+        if config.fuel > 0:
+            fuel = config.fuel - dw
             weight = self.weight_emp + fuel
-            acc = ship.config.NN * self.accMax(weight)
+            acc = config.NN * self.accMax(weight)
         else:  # ran out of fuel
             acc = 0
         v_acc -= vacc
-        if hs > 0:
-            hs -= h_acc * self.dt
-        dist -= hs * self.dt
-        vs -= v_acc * self.dt
-        alt -= self.dt * vs
+        hs = None
+        if config.hs > 0:
+            hs = config.hs - h_acc * dt
+        dist = config.dist - hs * dt
+        vs = config.vs - v_acc * dt
+        alt = config.alt - dt * vs
 
-        ship.config.update(dist = dist, vs = vs, hs = hs, acc = acc, alt = alt, fuel = fuel)
+        return dist,vs,hs,acc,alt,fuel
         
 
             
