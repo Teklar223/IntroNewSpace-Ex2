@@ -2,6 +2,7 @@ import Configuration
 from pygame.locals import *
 import pygame
 import copy
+import math
 from Engine import Engine
 
 # Constants
@@ -12,12 +13,15 @@ RIGHT = K_d
 
 class Spaceship(pygame.sprite.Sprite):
     def __init__(self, config : Configuration, *groups, _x = 0, _y = 0 ):
+
         # *** Pygame ***
         super().__init__(*groups)
-        self.image = pygame.Surface((50, 50))
-        self.image.fill((255, 100, 100))
+        self.original_image = pygame.Surface((50, 50), pygame.SRCALPHA)
+        pygame.draw.polygon(self.original_image, (255, 100, 100), [(0, 0), (25, 50), (50, 0)])
+        self.image = self.original_image
         self.rect = self.image.get_rect()
-        self.rect.center = (_x, _y)
+        self.rect.center = (0, 0)
+        self.paint_top_segment((100, 100, 100))
 
         # *** Physics ***
         self.config   =  copy.deepcopy(config) 
@@ -26,6 +30,16 @@ class Spaceship(pygame.sprite.Sprite):
 
         # *** Control ***
         self.is_player = False
+
+    def paint_top_segment(self, segment_color):
+        segment_width = 10  # Width of the top segment
+        segment_height = 10  # Height of the top segment
+    
+        top_segment = pygame.Surface((segment_width, segment_height), pygame.SRCALPHA)
+        pygame.draw.rect(top_segment, segment_color, (0, 0, segment_width, segment_height))
+    
+        self.image.blit(top_segment, (self.image.get_width() // 2 - segment_width // 2, 0))
+
 
     def up_fun(self):
         print("UP")
@@ -38,10 +52,17 @@ class Spaceship(pygame.sprite.Sprite):
     def left_fun(self):
         print("LEFT")
         self.config.angle = (self.config.angle + 10) % 360 # (self.config.angle + 3) % 360
+        self.rotate_ship()
 
     def right_fun(self):
         print("RIGHT")
         self.config.angle = (self.config.angle - 10) % 360
+        self.rotate_ship()
+        
+
+    def rotate_ship(self):
+        self.image = pygame.transform.rotate(self.original_image, self.config.angle)
+        self.rect = self.image.get_rect(center=self.rect.center)
 
     def update(self, dt, width, height, engine : Engine):
         keys = pygame.key.get_pressed()
@@ -61,8 +82,16 @@ class Spaceship(pygame.sprite.Sprite):
 
     def update_position(self, dt):
         config = self.config
-        self.rect.x += config.hs * dt
-        self.rect.y += config.vs * dt
+
+        dx = 0.01 * math.sin(math.radians(config.angle)) * config.hs
+        dy = -0.01 * math.cos(math.radians(config.angle)) * config.hs # Negative sign due to the inverted y-axis of pygame
+        
+        # Update the x and y coordinates
+        self.rect.x += dx
+        self.rect.y += dy
+
+        # self.rect.x += config.hs * dt
+        # self.rect.y += config.vs * dt
 
     def ensure_bounds(self, width, height):
         '''
