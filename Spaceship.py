@@ -12,7 +12,7 @@ LEFT = K_a
 RIGHT = K_d
 
 class Spaceship(pygame.sprite.Sprite):
-    def __init__(self, config : Configuration, *groups, _x = 0, _y = 0 ):
+    def __init__(self, config : Configuration, *groups, init_x = 0, init_y = 0 ):
 
         # *** Pygame ***
         super().__init__(*groups)
@@ -20,7 +20,7 @@ class Spaceship(pygame.sprite.Sprite):
         pygame.draw.polygon(self.original_image, (255, 100, 100), [(0, 0), (25, 50), (50, 0)])
         self.image = self.original_image
         self.rect = self.image.get_rect()
-        self.rect.center = (0, 0)
+        self.rect.center = (init_x, init_y)
         self.paint_top_segment((100, 100, 100))
 
         # *** Physics ***
@@ -44,6 +44,7 @@ class Spaceship(pygame.sprite.Sprite):
     def up_fun(self):
         print("UP")
         self.config.NN = min(1.0, self.config.NN + 0.1)
+        print("NN = ", self.config.NN)
 
     def down_fun(self):
         print("DOWN")
@@ -51,12 +52,12 @@ class Spaceship(pygame.sprite.Sprite):
     
     def left_fun(self):
         print("LEFT")
-        self.config.angle = (self.config.angle + 10) % 360 # (self.config.angle + 3) % 360
+        self.config.angle = (self.config.angle + 3) % 360 # (self.config.angle + 3) % 360
         self.rotate_ship()
 
     def right_fun(self):
         print("RIGHT")
-        self.config.angle = (self.config.angle - 10) % 360
+        self.config.angle = (self.config.angle - 3) % 360
         self.rotate_ship()
         
 
@@ -84,7 +85,7 @@ class Spaceship(pygame.sprite.Sprite):
         config = self.config
 
         dx = 0.01 * math.sin(math.radians(config.angle)) * config.hs
-        dy = -0.01 * math.cos(math.radians(config.angle)) * config.hs # Negative sign due to the inverted y-axis of pygame
+        dy = 0.01 * math.cos(math.radians(config.angle)) * config.hs # Negative sign due to the inverted y-axis of pygame
         
         # Update the x and y coordinates
         self.rect.x += dx
