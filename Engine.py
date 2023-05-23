@@ -27,6 +27,7 @@ class Engine():
     
     def main_calc(self, dt, config : Configuration) :
         # temps
+        print(config)
         ang_rad = math.radians(config.angle)
         h_acc = math.sin(ang_rad) * config.acc
         v_acc = math.cos(ang_rad) * config.acc

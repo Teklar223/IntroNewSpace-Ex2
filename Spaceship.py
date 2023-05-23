@@ -24,9 +24,9 @@ class Spaceship(pygame.sprite.Sprite):
         self.paint_top_segment((100, 100, 100))
 
         # *** Physics ***
-        self.config   =  copy.deepcopy(config) 
+        print(config.__dict__)
+        self.config   =  config
         self.velocity =  [config.hs, config.vs]
-        self.engine   =  Engine(self.config)
 
         # *** Control ***
         self.is_player = False

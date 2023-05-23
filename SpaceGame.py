@@ -6,7 +6,7 @@ from Spaceship import Spaceship
 from Engine import Engine
 from Util import InputBox,topg # to pygame (co-ordinates)
 from Constants import *
-
+import sys # TODO remove
 # wasd Constants
 UP = K_w
 DOWN = K_s
@@ -24,7 +24,7 @@ class SpaceGame:
         self.ship = None
         self.font = pygame.font.SysFont(None, 24)
         self.config_text_surfaces = {}
-        self.config = Configuration()  # Create a new configuration object
+        self.config = Configuration()  # Creates a default config
 
     def _handle_events(self):
         for event in pygame.event.get():
@@ -84,10 +84,11 @@ class SpaceGame:
                 #for input_box in input_boxes:
                 #    setattr(self.config, input_box.permatext, input_box.text)
                 input_boxes.clear()
-                self.startGame(self.config)
+                self.startGame()
                 running = False
 
     def set_config(self, key, value):
+        # todo: maybe more precise validation (per paramater?)
         def is_number(s):
             try:
                 float(s)
@@ -97,7 +98,7 @@ class SpaceGame:
 
         if is_number(value):
             d = self.config.__dict__
-            d[key] = value
+            d[key[:-2]] = float(value)
 
     
 
@@ -119,13 +120,13 @@ class SpaceGame:
         for text_surface in self.config_text_surfaces.values():
             self.screen.blit(text_surface, text_surface.get_rect())
 
-    def startGame(self, config):
+    def startGame(self):
         # Clear the screen
         self.screen.fill((255, 255, 255))
 
         x,y = topg(self.screen.get_width()/2, 0.9 * self.screen.get_height(), self.screen.get_height())
-        self.ship = Spaceship(config,init_x = x, init_y = y)
-        self.engine = Engine(config)
+        self.ship = Spaceship(self.config,init_x = x, init_y = y)
+        self.engine = Engine(self.config)
         running = True
 
         while running:
