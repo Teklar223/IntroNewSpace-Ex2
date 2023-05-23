@@ -72,6 +72,7 @@ class SpaceGame:
 
     def render_config_values(self, config):
         # TODO: render only the values we care about
+        # TODO: make editable
         y_offset = 10
         for key, value in config.__dict__.items():
             text = f"{key}: {value}"
