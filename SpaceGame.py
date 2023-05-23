@@ -24,6 +24,7 @@ class SpaceGame:
         self.ship = None
         self.font = pygame.font.SysFont(None, 24)
         self.config_text_surfaces = {}
+        self.config = Configuration()  # Create a new configuration object
 
     def _handle_events(self):
         for event in pygame.event.get():
@@ -37,19 +38,17 @@ class SpaceGame:
         self.startMenu()
     
     def startMenu(self):
-        config = Configuration()  # Create a new configuration object
         input_boxes = []  # List to store the input boxes
 
         # Create input boxes for each configuration variable
         y_offset = 10
-        for key, value in config.__dict__.items():
-            # TODO: render only the values we care about
-            # TODO: update the config after a value is set
-            permatxt = f"{key}: "
-            x = self.screen.get_width() - 210
-            input_box = InputBox(x, y_offset, 200, 30, text=str(value), permatext=permatxt)
-            input_boxes.append(input_box)
-            y_offset += 40
+        for key, value in self.config.__dict__.items():
+            if key not in ["WEIGHT_EMP","WEIGHT_FUEL","WEIGHT_FULL","MAIN_ENG_F","SECOND_ENG_F","MAIN_BURN","SECOND_BURN", "ALL_BURN", "is_player"]:
+                permatxt = f"{key}: "
+                x = self.screen.get_width() - 210
+                input_box = InputBox(x, y_offset, 200, 30, text=str(value), permatext=permatxt)
+                input_boxes.append(input_box)
+                y_offset += 40
 
         start_button_rect = pygame.Rect(300, 200, 200, 100)  # Rect for the start button
         running = True
@@ -82,24 +81,27 @@ class SpaceGame:
             # Check if the start button is clicked
             if pygame.mouse.get_pressed()[0] and start_button_rect.collidepoint(pygame.mouse.get_pos()):
                 # Update the configuration variables
-                for input_box in input_boxes:
-                    setattr(config, input_box.permatext, input_box.text)
-                self.startGame(config)
+                #for input_box in input_boxes:
+                #    setattr(self.config, input_box.permatext, input_box.text)
+                input_boxes.clear()
+                self.startGame(self.config)
                 running = False
 
+    def set_config(self, key, value):
+        self.config.__dict__[key] = value
 
     def render_config_values(self, config):
-        # TODO: render only the values we care about
         y_offset = 10
         for key, value in config.__dict__.items():
-            text = f"{key}: {value}"
-            if key not in self.config_text_surfaces or self.config_text_surfaces[key] != text:
-                rendered_text = self.font.render(text, True, (0, 0, 0))
-                self.config_text_surfaces[key] = rendered_text
-            text_surface = self.config_text_surfaces[key]
-            text_rect = text_surface.get_rect(topright=(self.screen.get_width() - 10, y_offset))
-            self.screen.blit(text_surface, text_rect)
-            y_offset += 24
+            if key not in ["WEIGHT_EMP","WEIGHT_FUEL","WEIGHT_FULL","MAIN_ENG_F","SECOND_ENG_F","MAIN_BURN","SECOND_BURN", "ALL_BURN", "is_player"]:
+                text = f"{key}: {value}"
+                if key not in self.config_text_surfaces or self.config_text_surfaces[key] != text:
+                    rendered_text = self.font.render(text, True, (0, 0, 0))
+                    self.config_text_surfaces[key] = rendered_text
+                text_surface = self.config_text_surfaces[key]
+                text_rect = text_surface.get_rect(topright=(self.screen.get_width() - 10, y_offset))
+                self.screen.blit(text_surface, text_rect)
+                y_offset += 24
 
     def blit_config_values(self):
         for text_surface in self.config_text_surfaces.values():

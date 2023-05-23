@@ -1,8 +1,12 @@
 import pygame as pg
 
+
+pg.init()
+screen = pg.display.set_mode((640, 480))
 COLOR_INACTIVE = pg.Color('lightskyblue3')
 COLOR_ACTIVE = pg.Color('dodgerblue2')
 FONT = pg.font.Font(None, 32)
+
 
 class InputBox:
 
@@ -15,15 +19,13 @@ class InputBox:
         self.txt_surface = FONT.render(self.text_to_render, True, self.color)
         self.active = False
 
-    def handle_event(self, event, set_method = None):
+    def handle_event(self, event):
         if event.type == pg.MOUSEBUTTONDOWN:
             # If the user clicked on the input_box rect.
             if self.rect.collidepoint(event.pos):
                 # Toggle the active variable.
                 self.active = not self.active
             else:
-                if set_method:
-                    set_method(self.text)
                 self.active = False
             # Change the current color of the input box.
             self.color = COLOR_ACTIVE if self.active else COLOR_INACTIVE
@@ -42,7 +44,8 @@ class InputBox:
 
     def update(self):
         # Resize the box if the text is too long.
-        self.rect.w = max(200, self.txt_surface.get_width() + 10)
+        width = max(200, self.txt_surface.get_width()+10)
+        self.rect.w = width
 
     def draw(self, screen):
         # Blit the text.
@@ -50,7 +53,33 @@ class InputBox:
         # Blit the rect.
         pg.draw.rect(screen, self.color, self.rect, 2)
 
-def topg(x, y, canvas_height):
-    _x = x
-    _y = canvas_height - y
-    return _x, _y
+
+
+def main():
+    clock = pg.time.Clock()
+    input_box1 = InputBox(100, 100, 140, 32, permatext="HELLO ")
+    input_box2 = InputBox(100, 300, 140, 32, permatext= "FUCK")
+    input_boxes = [input_box1, input_box2]
+    done = False
+
+    while not done:
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                done = True
+            for box in input_boxes:
+                box.handle_event(event)
+
+        for box in input_boxes:
+            box.update()
+
+        screen.fill((30, 30, 30))
+        for box in input_boxes:
+            box.draw(screen)
+
+        pg.display.flip()
+        clock.tick(30)
+
+
+if __name__ == '__main__':
+    main()
+    pg.quit()
