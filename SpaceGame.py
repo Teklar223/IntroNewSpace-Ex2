@@ -61,7 +61,7 @@ class SpaceGame:
 
                 # Handle events for the input boxes
                 for input_box in input_boxes:
-                    input_box.handle_event(event)
+                    input_box.handle_event(event, self.set_config)
 
             self.screen.fill((255, 255, 255))
 
@@ -88,9 +88,21 @@ class SpaceGame:
                 running = False
 
     def set_config(self, key, value):
-        self.config.__dict__[key] = value
+        def is_number(s):
+            try:
+                float(s)
+                return True
+            except ValueError:
+                return False
+
+        if is_number(value):
+            d = self.config.__dict__
+            d[key] = value
+
+    
 
     def render_config_values(self, config):
+        # TODO: display up to 3 numbers after the dot (.000 but not .0000)
         y_offset = 10
         for key, value in config.__dict__.items():
             if key not in ["WEIGHT_EMP","WEIGHT_FUEL","WEIGHT_FULL","MAIN_ENG_F","SECOND_ENG_F","MAIN_BURN","SECOND_BURN", "ALL_BURN", "is_player"]:

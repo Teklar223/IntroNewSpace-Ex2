@@ -23,7 +23,7 @@ class InputBox:
                 self.active = not self.active
             else:
                 if set_method:
-                    set_method(self.text)
+                    set_method(key = self.permatext, value = self.text)
                 self.active = False
             # Change the current color of the input box.
             self.color = COLOR_ACTIVE if self.active else COLOR_INACTIVE
