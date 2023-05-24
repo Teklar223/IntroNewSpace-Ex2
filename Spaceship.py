@@ -52,12 +52,12 @@ class Spaceship(pygame.sprite.Sprite):
     
     def left_fun(self):
         print("LEFT")
-        self.config.angle = (self.config.angle + 3) % 360 # (self.config.angle + 3) % 360
+        self.config.angle = (self.config.angle + 0.8) % 360 # (self.config.angle + 3) % 360
         self.rotate_ship()
 
     def right_fun(self):
         print("RIGHT")
-        self.config.angle = (self.config.angle - 3) % 360
+        self.config.angle = (self.config.angle - 0.8) % 360
         self.rotate_ship()
         
 
@@ -83,13 +83,36 @@ class Spaceship(pygame.sprite.Sprite):
 
     def update_position(self, dt):
         config = self.config
+        if self.config.NN == 0.:
+            print(self.config)
 
         dx = 0.01 * math.sin(math.radians(config.angle)) * config.hs
         dy = 0.01 * math.cos(math.radians(config.angle)) * config.hs # Negative sign due to the inverted y-axis of pygame
         
         # Update the x and y coordinates
-        self.rect.x += dx
-        self.rect.y += dy
+        ang = self.config.angle
+        nn = self.config.NN
+        if 175 <= ang <= 185:
+            if nn >= 1.:
+                self.rect.x -= dx / 4
+                self.rect.y -= dy / 7
+            elif nn <= 0:
+                self.rect.x -= dx
+                self.rect.y -= dy
+            else:
+                self.rect.x -= dx * (1 - nn)
+                self.rect.y -= dy * (1 - nn)
+        else:
+            if nn >= 1.:
+                self.rect.x += dx / 4
+                self.rect.y += dy / 7
+            elif nn <= 0:
+                self.rect.x += dx
+                self.rect.y += dy
+            else:
+                self.rect.x += dx * (1 - nn)
+                self.rect.y += dy * (1 - nn)
+
 
         # self.rect.x += config.hs * dt
         # self.rect.y += config.vs * dt

@@ -1,0 +1,1 @@
+bg_name = 'Media/background.jpg'

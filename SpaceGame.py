@@ -1,3 +1,5 @@
+import math
+
 import pygame
 from pygame.locals import *
 from random import randint
@@ -5,6 +7,8 @@ from Configuration import Configuration
 from Spaceship import Spaceship
 from Engine import Engine
 from Util import InputBox,topg # to pygame (co-ordinates)
+from pygame_functions import *
+from game_constants import *
 from Constants import *
 import sys # TODO remove
 # wasd Constants
@@ -25,6 +29,8 @@ class SpaceGame:
         self.font = pygame.font.SysFont(None, 24)
         self.config_text_surfaces = {}
         self.config = Configuration()  # Creates a default config
+        self.bg = Background()
+        self.bg.setTiles(tiles=bg_name, screen=self.screen)
 
     def _handle_events(self):
         for event in pygame.event.get():
@@ -100,16 +106,14 @@ class SpaceGame:
             d = self.config.__dict__
             d[key[:-2]] = float(value)
 
-    
-
     def render_config_values(self, config):
         # TODO: display up to 3 numbers after the dot (.000 but not .0000)
         y_offset = 10
         for key, value in config.__dict__.items():
             if key not in ["WEIGHT_EMP","WEIGHT_FUEL","WEIGHT_FULL","MAIN_ENG_F","SECOND_ENG_F","MAIN_BURN","SECOND_BURN", "ALL_BURN", "is_player"]:
-                text = f"{key}: {value}"
+                text = f"{key}: {value:.5f}"
                 if key not in self.config_text_surfaces or self.config_text_surfaces[key] != text:
-                    rendered_text = self.font.render(text, True, (0, 0, 0))
+                    rendered_text = self.font.render(text, True, (255, 255, 255))
                     self.config_text_surfaces[key] = rendered_text
                 text_surface = self.config_text_surfaces[key]
                 text_rect = text_surface.get_rect(topright=(self.screen.get_width() - 10, y_offset))
@@ -122,24 +126,53 @@ class SpaceGame:
 
     def startGame(self):
         # Clear the screen
-        self.screen.fill((255, 255, 255))
+        # self.screen.fill((255, 255, 255))
+        bg = pygame.image.load('Media/background.jpg').convert()
+        scroll = 0
+        tiles = math.ceil(self.screen.get_width() / bg.get_width()) + 1
 
         x,y = topg(self.screen.get_width()/2, 0.9 * self.screen.get_height(), self.screen.get_height())
         self.ship = Spaceship(self.config,init_x = x, init_y = y)
+        self.ship.rotate_ship() # Rotate the ship to the correct angle to begin the simulation
         self.engine = Engine(self.config)
         running = True
-
+        bg_speed = 5
         while running:
-            dt = self.clock.tick(60) / 100.0
+            dt = self.clock.tick(60) / 1000.0
+            # self.clock.tick(10) # Determine the refresh rate
+            # dt = 1
             running = self._handle_events()
 
             self.ship.update(engine=self.engine, dt=dt, width=self.screen.get_width(), height=self.screen.get_height())
-
-            self.screen.fill((255, 255, 255))
-            self.screen.blit(self.ship.image, self.ship.rect)
-
+            # self.screen.fill((255, 255, 255))
+            ang = self.config.angle
+            if 175 < ang < 185:
+                scrollBackground(0, bg_speed, self.bg, self.screen)
+            elif 85 < ang < 95:
+                scrollBackground(-bg_speed, 0, self.bg, self.screen)
+            elif ang < 5 or ang > 355:
+                scrollBackground(0, -bg_speed, self.bg, self.screen)
+            elif 265 < ang < 275:
+                scrollBackground(-bg_speed, 0, self.bg, self.screen)
+            elif 95 <= ang <= 135:
+                scrollBackground(-bg_speed, bg_speed, self.bg, self.screen)
+            elif 135 < ang <= 175:
+                scrollBackground(math.floor(-0.5 * bg_speed), bg_speed, self.bg, self.screen)
+            elif 5 <= ang < 45:
+                scrollBackground(-bg_speed, -bg_speed, self.bg, self.screen)
+            elif 45 <= ang <= 85:
+                scrollBackground(-bg_speed, math.floor(-0.5 * bg_speed), self.bg, self.screen)
+            elif 275 <= ang <= 315:
+                scrollBackground(math.floor(0.5 * bg_speed), -bg_speed, self.bg, self.screen)
+            elif 315 < ang <= 355:
+                scrollBackground(bg_speed, math.floor(-0.5 * bg_speed), self.bg, self.screen)
+            elif 185 <= ang <= 225:
+                scrollBackground(math.floor(0.5 * bg_speed), bg_speed, self.bg, self.screen)
+            else:
+                scrollBackground(bg_speed, bg_speed, self.bg, self.screen)
             # Render and blit configuration values
             self.render_config_values(self.ship.config)
+            self.screen.blit(self.ship.image, self.ship.rect)
 
             pygame.display.flip()
 
