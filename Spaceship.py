@@ -65,6 +65,11 @@ class Spaceship(pygame.sprite.Sprite):
         self.image = pygame.transform.rotate(self.original_image, self.config.angle)
         self.rect = self.image.get_rect(center=self.rect.center)
 
+    def set_first_position(self, width: int, height: int):
+        self.rect.x = int(width / 2)
+        self.rect.y = int(height / 2)
+
+
     def update(self, dt, width, height, engine : Engine):
         keys = pygame.key.get_pressed()
         if keys[UP] or keys[K_UP]:
@@ -92,26 +97,26 @@ class Spaceship(pygame.sprite.Sprite):
         # Update the x and y coordinates
         ang = self.config.angle
         nn = self.config.NN
-        if 175 <= ang <= 185:
-            if nn >= 1.:
-                self.rect.x -= dx / 4
-                self.rect.y -= dy / 7
-            elif nn <= 0:
-                self.rect.x -= dx
-                self.rect.y -= dy
-            else:
-                self.rect.x -= dx * (1 - nn)
-                self.rect.y -= dy * (1 - nn)
-        else:
-            if nn >= 1.:
-                self.rect.x += dx / 4
-                self.rect.y += dy / 7
-            elif nn <= 0:
-                self.rect.x += dx
-                self.rect.y += dy
-            else:
-                self.rect.x += dx * (1 - nn)
-                self.rect.y += dy * (1 - nn)
+        # if 175 <= ang <= 185:
+        #     if nn >= 1.:
+        #         self.rect.x -= dx / 4
+        #         self.rect.y -= dy / 7
+        #     elif nn <= 0:
+        #         self.rect.x -= dx
+        #         self.rect.y -= dy
+        #     else:
+        #         self.rect.x -= dx * (1 - nn)
+        #         self.rect.y -= dy * (1 - nn)
+        # else:
+        #     if nn >= 1.:
+        #         self.rect.x += dx / 4
+        #         self.rect.y += dy / 7
+        #     elif nn <= 0:
+        #         self.rect.x += dx
+        #         self.rect.y += dy
+        #     else:
+        #         self.rect.x += dx * (1 - nn)
+        #         self.rect.y += dy * (1 - nn)
 
 
         # self.rect.x += config.hs * dt
