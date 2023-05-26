@@ -52,22 +52,26 @@ class Spaceship(pygame.sprite.Sprite):
     
     def left_fun(self):
         print("LEFT")
-        self.config.angle = (self.config.angle + 0.8) % 360 # (self.config.angle + 3) % 360
+        self.config.angle = (self.config.angle - 0.8) % 360 # (self.config.angle + 3) % 360
         self.rotate_ship()
 
     def right_fun(self):
         print("RIGHT")
-        self.config.angle = (self.config.angle - 0.8) % 360
+        self.config.angle = (self.config.angle + 0.8) % 360
         self.rotate_ship()
         
 
     def rotate_ship(self):
-        self.image = pygame.transform.rotate(self.original_image, self.config.angle)
+        self.image = pygame.transform.rotate(self.original_image, 180 - self.config.angle)
         self.rect = self.image.get_rect(center=self.rect.center)
 
     def set_first_position(self, width: int, height: int):
         self.rect.x = int(width / 2)
         self.rect.y = int(height / 2)
+
+    # def initiate_angle(self):
+    #     self.config.angle += 120
+    #     self.config.angle %= 360
 
 
     def update(self, dt, width, height, engine : Engine):
@@ -97,26 +101,28 @@ class Spaceship(pygame.sprite.Sprite):
         # Update the x and y coordinates
         ang = self.config.angle
         nn = self.config.NN
-        # if 175 <= ang <= 185:
-        #     if nn >= 1.:
-        #         self.rect.x -= dx / 4
-        #         self.rect.y -= dy / 7
-        #     elif nn <= 0:
-        #         self.rect.x -= dx
-        #         self.rect.y -= dy
-        #     else:
-        #         self.rect.x -= dx * (1 - nn)
-        #         self.rect.y -= dy * (1 - nn)
-        # else:
-        #     if nn >= 1.:
-        #         self.rect.x += dx / 4
-        #         self.rect.y += dy / 7
-        #     elif nn <= 0:
-        #         self.rect.x += dx
-        #         self.rect.y += dy
-        #     else:
-        #         self.rect.x += dx * (1 - nn)
-        #         self.rect.y += dy * (1 - nn)
+        alt = self.config.alt
+        if alt < 1000:
+            if 175 <= ang <= 185:
+                if nn >= 1.:
+                    self.rect.x -= dx / 4
+                    self.rect.y -= dy / 7
+                elif nn <= 0:
+                    self.rect.x -= dx
+                    self.rect.y -= dy
+                else:
+                    self.rect.x -= dx * (1 - nn)
+                    self.rect.y -= dy * (1 - nn)
+            else:
+                if nn >= 1.:
+                    self.rect.x += dx / 4
+                    self.rect.y += dy / 7
+                elif nn <= 0:
+                    self.rect.x += dx
+                    self.rect.y += dy
+                else:
+                    self.rect.x += dx * (1 - nn)
+                    self.rect.y += dy * (1 - nn)
 
 
         # self.rect.x += config.hs * dt

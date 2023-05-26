@@ -28,7 +28,9 @@ class Engine():
     def main_calc(self, dt, config : Configuration) :
         # temps
         print(config)
+        # ang_real = (180 - config.angle) % 360
         ang_rad = math.radians(config.angle)
+        # ang_rad = math.radians(ang_real)
         h_acc = math.sin(ang_rad) * config.acc
         v_acc = math.cos(ang_rad) * config.acc
         vacc = Moon.getAcc(config.hs)
@@ -48,6 +50,8 @@ class Engine():
             hs = config.hs - h_acc * dt
         dist = config.dist - hs * dt
         vs = config.vs - v_acc * dt
+        if vs < 0:
+            vs = 0
         alt = config.alt - dt * vs
 
         return dist,vs,hs,acc,alt,fuel, weight
