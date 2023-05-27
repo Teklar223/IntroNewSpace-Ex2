@@ -56,4 +56,4 @@ def to_pg_coords(x, y, canvas_height):
     return _x, _y
 
 def to_pg_angle(angle):
-    return 180 + angle 
+    return angle - 90
