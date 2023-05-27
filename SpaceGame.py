@@ -1,27 +1,32 @@
 import math
+import random
 
+from GuidingArrow import get_angle, distance
 import pygame
 from pygame.locals import *
 from random import randint
 from Configuration import Configuration
 from Spaceship import Spaceship
 from Engine import Engine
-from Util import InputBox,topg # to pygame (co-ordinates)
+from Util import InputBox, topg  # to pygame (co-ordinates)
 from pygame_functions import *
 from game_constants import *
 from Constants import *
-import sys # TODO remove
+import sys  # TODO remove
+
 # wasd Constants
 UP = K_w
 DOWN = K_s
 LEFT = K_a
 RIGHT = K_d
 
+
 class SpaceGame:
     '''
     This is the 'Controller' of our simulation
     '''
-    def __init__(self,width = 640, height = 480):
+
+    def __init__(self, width=1600, height=600):
         pygame.init()
         self.screen = pygame.display.set_mode((width, height))
         self.clock = pygame.time.Clock()
@@ -30,7 +35,6 @@ class SpaceGame:
         self.config_text_surfaces = {}
         self.config = Configuration()  # Creates a default config
         self.bg = Background()
-        self.bg.setTiles(tiles=bg_name, screen=self.screen)
 
     def _handle_events(self):
         for event in pygame.event.get():
@@ -39,17 +43,18 @@ class SpaceGame:
                 return False
 
         return True
-    
+
     def start(self):
         self.startMenu()
-    
+
     def startMenu(self):
         input_boxes = []  # List to store the input boxes
 
         # Create input boxes for each configuration variable
         y_offset = 10
         for key, value in self.config.__dict__.items():
-            if key not in ["WEIGHT_EMP","WEIGHT_FUEL","WEIGHT_FULL","MAIN_ENG_F","SECOND_ENG_F","MAIN_BURN","SECOND_BURN", "ALL_BURN", "is_player"]:
+            if key not in ["WEIGHT_EMP", "WEIGHT_FUEL", "WEIGHT_FULL", "MAIN_ENG_F", "SECOND_ENG_F", "MAIN_BURN",
+                           "SECOND_BURN", "ALL_BURN", "is_player"]:
                 permatxt = f"{key}: "
                 x = self.screen.get_width() - 210
                 input_box = InputBox(x, y_offset, 200, 30, text=str(value), permatext=permatxt)
@@ -87,7 +92,7 @@ class SpaceGame:
             # Check if the start button is clicked
             if pygame.mouse.get_pressed()[0] and start_button_rect.collidepoint(pygame.mouse.get_pos()):
                 # Update the configuration variables
-                #for input_box in input_boxes:
+                # for input_box in input_boxes:
                 #    setattr(self.config, input_box.permatext, input_box.text)
                 input_boxes.clear()
                 self.startGame()
@@ -110,7 +115,8 @@ class SpaceGame:
         # TODO: display up to 3 numbers after the dot (.000 but not .0000)
         y_offset = 10
         for key, value in config.__dict__.items():
-            if key not in ["WEIGHT_EMP","WEIGHT_FUEL","WEIGHT_FULL","MAIN_ENG_F","SECOND_ENG_F","MAIN_BURN","SECOND_BURN", "ALL_BURN", "is_player"]:
+            if key not in ["WEIGHT_EMP", "WEIGHT_FUEL", "WEIGHT_FULL", "MAIN_ENG_F", "SECOND_ENG_F", "MAIN_BURN",
+                           "SECOND_BURN", "ALL_BURN", "is_player"]:
                 text = f"{key}: {value:.5f}"
                 if key not in self.config_text_surfaces or self.config_text_surfaces[key] != text:
                     rendered_text = self.font.render(text, True, (255, 255, 255))
@@ -127,71 +133,124 @@ class SpaceGame:
     def startGame(self):
         # Clear the screen
         # self.screen.fill((255, 255, 255))
+        x = 0
+        y = 0
         bg = pygame.image.load('Media/background.jpg').convert()
+        arrow = pygame.image.load('Media/arrow.png')
+
+        arrow = pygame.transform.scale(arrow, (60, 100))
+        x_arrow = 60
+        y_arrow = 60
         scroll = 0
         tiles = math.ceil(self.screen.get_width() / bg.get_width()) + 1
-
-        x,y = topg(self.screen.get_width()/2, 0.9 * self.screen.get_height(), self.screen.get_height())
-        self.ship = Spaceship(self.config,init_x = x, init_y = y)
-        self.ship.rotate_ship() # Rotate the ship to the correct angle to begin the simulation
+        x_space = int(self.screen.get_width() / 2)
+        y_space = int(self.screen.get_height() / 2)
+        moon_coordinates = [int(self.screen.get_width() / 2), -50000]
+        grid_size = 3
+        grid = []
+        for i in range(grid_size):
+            row = [bg_name for i in range(grid_size)]
+            grid.append(row)
+        event_i = random.randint(0, grid_size - 1)
+        event_j = random.randint(0, grid_size - 1)
+        grid[event_i][event_j] = death_star
+        # self.bg.setTiles(tiles=[bg_name, 'Media/death_star.jpeg', 'Media/knowhere.jpg'], screen=self.screen)
+        self.bg.setTiles(tiles=grid, screen=self.screen)
+        x, y = topg(self.screen.get_width() / 2, 0.9 * self.screen.get_height(), self.screen.get_height())
+        self.ship = Spaceship(self.config, init_x=x, init_y=y)
+        self.ship.rotate_ship()  # Rotate the ship to the correct angle to begin the simulation
         self.ship.set_first_position(self.screen.get_width(), self.screen.get_height())
         # self.ship.initiate_angle()
         self.engine = Engine(self.config)
         running = True
-        speed_boost = 15
+        speed_boost = 25
         bg_speed = 5
         while running:
+            event = random.randint(0, 1000)
             fuel = self.config.fuel
             alt = self.config.alt
             if alt <= 0 or fuel <= 0:
                 break
-            ticks = 30
+            ticks = 60
             fps = self.clock.tick(ticks)
             dt = float(1 / ticks)
             # dt = 1.0
-            bg_speed += speed_boost * (1 - self.config.NN) # define the background speed as a function of NN
+            bg_speed += speed_boost * (1 - self.config.NN)  # define the background speed as a function of NN
             # self.clock.tick(10) # Determine the refresh rate
             # dt = 0.5
             running = self._handle_events()
 
             self.ship.update(engine=self.engine, dt=dt, width=self.screen.get_width(), height=self.screen.get_height())
             # self.screen.fill((255, 255, 255))
+            dx_space = 0
+            dy_space = 0
             ang = self.config.angle
-            if ang < 5 or ang > 355: # Up
+            if ang < 5 or ang > 355:  # Up
                 scrollBackground(0, int(bg_speed), self.bg, self.screen)
-            elif 85 < ang < 95: # Right
+                dy_space += int(bg_speed) / 2
+            elif 85 < ang < 95:  # Right
                 scrollBackground(int(-bg_speed), 0, self.bg, self.screen)
-            elif 175 < ang < 185: # Down
+                dx_space += int(-bg_speed) / 2
+            elif 175 < ang < 185:  # Down
                 scrollBackground(0, int(-bg_speed), self.bg, self.screen)
-            elif 265 < ang < 275: # Left
+                dy_space += int(-bg_speed) / 2
+            elif 265 < ang < 275:  # Left
                 scrollBackground(int(bg_speed), 0, self.bg, self.screen)
-            elif 95 <= ang <= 135: # (+Rigth, -Down)
+                dx_space += int(bg_speed) / 2
+            elif 95 <= ang <= 135:  # (+Rigth, -Down)
                 # scrollBackground(-int(bg_speed), int(bg_speed), self.bg, self.screen)
                 scrollBackground(-int(bg_speed), math.floor(-0.5 * bg_speed), self.bg, self.screen)
-            elif 135 < ang <= 175: # (-Right, + Down)
+                dx_space += -int(bg_speed) / 2
+                dy_space += math.floor(-0.5 * bg_speed) / 2
+            elif 135 < ang <= 175:  # (-Right, + Down)
                 # scrollBackground(math.floor(-0.5 * bg_speed), int(bg_speed), self.bg, self.screen)
                 scrollBackground(-int(bg_speed), -int(bg_speed), self.bg, self.screen)
-            elif 5 <= ang < 45: # (+Up, -Right)
+                dx_space += -int(bg_speed) / 2
+                dy_space += -int(bg_speed) / 2
+            elif 5 <= ang < 45:  # (+Up, -Right)
                 scrollBackground(math.floor(-0.5 * bg_speed), int(bg_speed), self.bg, self.screen)
+                dx_space += math.floor(-0.5 * bg_speed) / 2
+                dy_space += int(bg_speed) / 2
                 # scrollBackground(-int(bg_speed), -int(bg_speed), self.bg, self.screen)
-            elif 45 <= ang <= 85: # (-Up, +Right)
+            elif 45 <= ang <= 85:  # (-Up, +Right)
                 # scrollBackground(-int(bg_speed), math.floor(-0.5 * bg_speed), self.bg, self.screen)
                 scrollBackground(-int(bg_speed), int(bg_speed), self.bg, self.screen)
-            elif 275 <= ang <= 315: # (+Left, -Up)
+                dx_space += -int(bg_speed) / 2
+                dy_space += int(bg_speed) / 2
+            elif 275 <= ang <= 315:  # (+Left, -Up)
                 # scrollBackground(int(bg_speed), math.floor(-0.5 * bg_speed), self.bg, self.screen)
                 scrollBackground(int(bg_speed), int(bg_speed), self.bg, self.screen)
-            elif 315 < ang <= 355: # (-Left, +Up)
+                dx_space += int(bg_speed) /2
+                dy_space += int(bg_speed) / 2
+            elif 315 < ang <= 355:  # (-Left, +Up)
                 # scrollBackground(int(bg_speed), -int(bg_speed), self.bg, self.screen)
                 scrollBackground(math.floor(0.5 * bg_speed), int(bg_speed), self.bg, self.screen)
-            elif 185 <= ang <= 225: # (+Down, -Left)
+                dx_space += math.floor(0.5 * bg_speed) / 2
+                dy_space += int(bg_speed) / 2
+            elif 185 <= ang <= 225:  # (+Down, -Left)
                 # scrollBackground(math.floor(0.5 * bg_speed), int(bg_speed), self.bg, self.screen)
                 scrollBackground(int(bg_speed), -int(bg_speed), self.bg, self.screen)
-            else: # (-Down, +Left)
+                dx_space += int(bg_speed) / 2
+                dy_space += -int(bg_speed) / 2
+            else:  # (-Down, +Left)
                 # scrollBackground(int(bg_speed), int(bg_speed), self.bg, self.screen)
                 scrollBackground(int(bg_speed), math.floor(-0.5 * bg_speed), self.bg, self.screen)
+                dx_space += int(bg_speed) / 2
+                dy_space += math.floor(-0.5 * bg_speed) / 2
+            x_space += dx_space * 100 * dt
+            y_space += dy_space * 100 * dt
+            space_coordinates = [x_space, y_space]
+            if distance(space_coordinates, moon_coordinates) < 1000:
+                moon_coordinates[1] *= 2
+            arrow_angle = (get_angle(space_coordinates, moon_coordinates) - 90) % 360
+            # arrow_angle = 0
+            rotated_arrow = pygame.transform.rotate(arrow, arrow_angle)
+            rotated_rectangle = rotated_arrow.get_rect(center=(x_arrow, y_arrow))
+
             # Render and blit configuration values
             self.render_config_values(self.ship.config)
             self.screen.blit(self.ship.image, self.ship.rect)
+            self.screen.blit(rotated_arrow, rotated_rectangle)
 
             pygame.display.flip()
             bg_speed = 5

@@ -2,11 +2,13 @@ import pygame as pg
 
 COLOR_INACTIVE = pg.Color('lightskyblue3')
 COLOR_ACTIVE = pg.Color('dodgerblue2')
+pg.font.init()
 FONT = pg.font.Font(None, 32)
+
 
 class InputBox:
 
-    def __init__(self, x, y, w, h, text='', permatext = 'HELLO: '):
+    def __init__(self, x, y, w, h, text='', permatext='HELLO: '):
         self.rect = pg.Rect(x, y, w, h)
         self.color = COLOR_INACTIVE
         self.text = text
@@ -15,7 +17,7 @@ class InputBox:
         self.txt_surface = FONT.render(self.text_to_render, True, self.color)
         self.active = False
 
-    def handle_event(self, event, set_method = None):
+    def handle_event(self, event, set_method=None):
         if event.type == pg.MOUSEBUTTONDOWN:
             # If the user clicked on the input_box rect.
             if self.rect.collidepoint(event.pos):
@@ -23,7 +25,7 @@ class InputBox:
                 self.active = not self.active
             else:
                 if set_method:
-                    set_method(key = self.permatext, value = self.text)
+                    set_method(key=self.permatext, value=self.text)
                 self.active = False
             # Change the current color of the input box.
             self.color = COLOR_ACTIVE if self.active else COLOR_INACTIVE
@@ -46,9 +48,10 @@ class InputBox:
 
     def draw(self, screen):
         # Blit the text.
-        screen.blit(self.txt_surface, (self.rect.x+5, self.rect.y+5))
+        screen.blit(self.txt_surface, (self.rect.x + 5, self.rect.y + 5))
         # Blit the rect.
         pg.draw.rect(screen, self.color, self.rect, 2)
+
 
 def topg(x, y, canvas_height):
     _x = x

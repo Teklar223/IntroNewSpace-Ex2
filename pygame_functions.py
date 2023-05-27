@@ -102,6 +102,8 @@ class Background():
 
         col2 = ((self.stagePosX + self.tileWidth) % (self.tileWidth * len(self.tiles[0]))) // self.tileWidth
         row2 = ((self.stagePosY + self.tileHeight) % (self.tileHeight * len(self.tiles))) // self.tileHeight
+        if col == col2 and row == row2:
+            print(f"row {row} col {col}")
         screen.blit(self.tiles[row][col], [xOff, yOff])
         screen.blit(self.tiles[row][col2], [xOff + self.tileWidth, yOff])
         screen.blit(self.tiles[row2][col], [xOff, yOff + self.tileHeight])
