@@ -6,7 +6,7 @@ from random import randint
 from Configuration import Configuration
 from Spaceship import Spaceship
 from Engine import Engine
-from Util import InputBox,topg # to pygame (co-ordinates)
+from Util import InputBox,to_pg_coords # to pygame (co-ordinates)
 from pygame_functions import *
 from game_constants import *
 from Constants import *
@@ -28,7 +28,13 @@ class SpaceGame:
         self.ship = None
         self.font = pygame.font.SysFont(None, 24)
         self.config_text_surfaces = {}
-        self.config = Configuration()  # Creates a default config
+        kwargs = {
+            f"{c_vertical_speed}": 0.0,
+            f"{c_horizontal_speed}": 0.0,
+            f"{c_angle}": 90.0,
+            f"{c_engine_power}": 0.0
+        }
+        self.config = Configuration(**kwargs)  # Creates a default config
         self.bg = Background()
         self.bg.setTiles(tiles=bg_name, screen=self.screen)
 
@@ -106,8 +112,9 @@ class SpaceGame:
             d = self.config.__dict__
             d[key[:-2]] = float(value)
 
-    def render_config_values(self, config):
+    def render_config(self, config):
         # TODO: display up to 3 numbers after the dot (.000 but not .0000)
+        # TODO: display avg of the previous x dt for every param? (say avg speed in the last 5 dt)
         y_offset = 10
         for key, value in config.__dict__.items():
             if key not in ["WEIGHT_EMP","WEIGHT_FUEL","WEIGHT_FULL","MAIN_ENG_F","SECOND_ENG_F","MAIN_BURN","SECOND_BURN", "ALL_BURN", "is_player"]:
@@ -124,6 +131,12 @@ class SpaceGame:
         for text_surface in self.config_text_surfaces.values():
             self.screen.blit(text_surface, text_surface.get_rect())
 
+    def render_background(self):
+        # get the opposite speeds (cause we want the image to go in the other direction the ships is 'going')
+        hs = -self.config.hs
+        vs = -self.config.vs
+        scrollBackground(int(hs), -int(vs), self.bg, self.screen) # y is negative due to pygame
+
     def startGame(self):
         # Clear the screen
         # self.screen.fill((255, 255, 255))
@@ -131,53 +144,25 @@ class SpaceGame:
         scroll = 0
         tiles = math.ceil(self.screen.get_width() / bg.get_width()) + 1
 
-        x,y = topg(self.screen.get_width()/2, 0.9 * self.screen.get_height(), self.screen.get_height())
+        x,y = to_pg_coords(self.screen.get_width()/2, 0.9 * self.screen.get_height(), self.screen.get_height())
         self.ship = Spaceship(self.config,init_x = x, init_y = y)
         self.ship.rotate_ship() # Rotate the ship to the correct angle to begin the simulation
         self.ship.set_first_position(self.screen.get_width(), self.screen.get_height())
         self.engine = Engine(self.config)
         running = True
-        speed_boost = 15
-        bg_speed = 5
         while running:
             dt = self.clock.tick(30) / 800.0
-            bg_speed += speed_boost * (1 - self.config.NN) # define the background speed as a function of NN
             # self.clock.tick(10) # Determine the refresh rate
             # dt = 1
             running = self._handle_events()
 
             self.ship.update(engine=self.engine, dt=dt, width=self.screen.get_width(), height=self.screen.get_height())
-            # self.screen.fill((255, 255, 255))
-            ang = self.config.angle
-            if 175 < ang < 185:
-                scrollBackground(0, int(bg_speed), self.bg, self.screen)
-            elif 85 < ang < 95:
-                scrollBackground(int(-bg_speed), 0, self.bg, self.screen)
-            elif ang < 5 or ang > 355:
-                scrollBackground(0, int(-bg_speed), self.bg, self.screen)
-            elif 265 < ang < 275:
-                scrollBackground(-int(bg_speed), 0, self.bg, self.screen)
-            elif 95 <= ang <= 135:
-                scrollBackground(-int(bg_speed), int(bg_speed), self.bg, self.screen)
-            elif 135 < ang <= 175:
-                scrollBackground(math.floor(-0.5 * bg_speed), int(bg_speed), self.bg, self.screen)
-            elif 5 <= ang < 45:
-                scrollBackground(-int(bg_speed), -int(bg_speed), self.bg, self.screen)
-            elif 45 <= ang <= 85:
-                scrollBackground(-int(bg_speed), math.floor(-0.5 * bg_speed), self.bg, self.screen)
-            elif 275 <= ang <= 315:
-                scrollBackground(int(bg_speed), math.floor(-0.5 * bg_speed), self.bg, self.screen)
-            elif 315 < ang <= 355:
-                scrollBackground(int(bg_speed), -int(bg_speed), self.bg, self.screen)
-            elif 185 <= ang <= 225:
-                scrollBackground(math.floor(0.5 * bg_speed), int(bg_speed), self.bg, self.screen)
-            else:
-                scrollBackground(int(bg_speed), int(bg_speed), self.bg, self.screen)
-            # Render and blit configuration values
-            self.render_config_values(self.ship.config)
+            
+            self.render_background()
+            self.render_config(self.ship.config)
             self.screen.blit(self.ship.image, self.ship.rect)
 
             pygame.display.flip()
-            bg_speed = 5
+            speed = 5
 
         pygame.quit()

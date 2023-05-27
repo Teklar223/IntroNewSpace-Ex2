@@ -20,33 +20,15 @@ class Configuration():
         self.acc = kwargs.get(c_acceleration, 0)  # Acceleration rate (m/s^2)
         self.fuel = kwargs.get(c_fuel, 121)  #     
         self.weight = self.WEIGHT_EMP + self.fuel # initial weight
-        self.NN = kwargs.get(c_engine_power, 0.7)  # engine power rate (in the range [0,1]), higher = more braking power
+        self.thrust = kwargs.get(c_engine_power, 0.7)  # engine power rate (in the range [0,1]), higher = more braking power
         self.is_player = False
         self.time = 0
 
-    def update(self, dt = None, vs = None, hs = None, dist = None, angle = None, alt = None, acc = None, fuel = None, weight = None, NN = None, is_player = None):
-        if dt is not None:
-            self.time += dt # notice this rule is different!
-        if vs is not None:
-            self.vs = vs
-        if hs is not None:
-            self.hs = hs
-        if dist is not None:
-            self.dist = dist
-        if angle is not None:
-            self.angle = angle
-        if alt is not None:
-            self.alt = alt
-        if acc is not None:
-            self.acc = acc
-        if fuel is not None:
-            self.fuel = fuel
-        if weight is not None:
-            self.weight = weight
-        if NN is not None:
-            self.NN = NN
-        if is_player is not None:
-            self.is_player = is_player
+    def update(self, **kwargs):
+        valid_attributes = set(vars(self).keys())
+        for key, value in kwargs.items():
+            if key in valid_attributes:
+                setattr(self, key, value)
 
     def save(self, path = None) -> None:
         '''

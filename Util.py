@@ -50,7 +50,10 @@ class InputBox:
         # Blit the rect.
         pg.draw.rect(screen, self.color, self.rect, 2)
 
-def topg(x, y, canvas_height):
+def to_pg_coords(x, y, canvas_height):
     _x = x
     _y = canvas_height - y
     return _x, _y
+
+def to_pg_angle(angle):
+    return 180 + angle 
