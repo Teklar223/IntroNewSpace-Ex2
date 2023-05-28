@@ -1,10 +1,10 @@
-import Configuration
+import Src.Configuration as Configuration
 from pygame.locals import *
 import pygame
 import copy
 import math
-from Engine import Engine
-from Util import to_pg_angle
+from Src.Engine import Engine
+from .Util.Util import to_pg_angle
 
 # Constants
 UP = K_w

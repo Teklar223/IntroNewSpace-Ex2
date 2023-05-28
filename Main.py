@@ -3,7 +3,7 @@ import pygame as pg
 pg.init()
 pg.font.init()
 
-from SpaceGame import SpaceGame
+from Src.SpaceGame import SpaceGame
 
 def main():
     '''

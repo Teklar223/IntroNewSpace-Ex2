@@ -1,17 +1,17 @@
 import math
 import random
 
-from GuidingArrow import get_angle, distance
+from Src.GuidingArrow import get_angle, distance
 import pygame
 from pygame.locals import *
 from random import randint
-from Configuration import Configuration
-from Spaceship import Spaceship
-from Engine import Engine
-from Util import InputBox,to_pg_coords, to_pg_angle # to pygame (co-ordinates)
-from pygame_functions import *
-from game_constants import *
-from Constants import *
+from Src.Configuration import Configuration
+from Src.Spaceship import Spaceship
+from Src.Engine import Engine
+from .Util.Util import InputBox,to_pg_coords, to_pg_angle # to pygame (co-ordinates)
+from .Util.pygame_functions import *
+from Src.game_constants import *
+from Src.Constants import *
 import sys  # TODO remove
 
 # wasd Constants
@@ -172,6 +172,7 @@ class SpaceGame:
         self.screen.blit(rotated_arrow, rotated_rectangle)
 
     def startGame(self):
+        os.chdir("..")
         bg = pygame.image.load('Media/background.jpg').convert()
         arrow = pygame.image.load('Media/arrow.png')
 

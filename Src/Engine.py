@@ -1,7 +1,7 @@
 import numpy as np
 import math
-import Moon, Configuration
-from Constants import *
+import Src.Moon as Moon, Src.Configuration as Configuration
+from Src.Constants import *
 
 
 class Engine():
