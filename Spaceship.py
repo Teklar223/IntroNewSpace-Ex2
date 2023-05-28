@@ -17,13 +17,12 @@ class Spaceship(pygame.sprite.Sprite):
 
         # *** Pygame ***
         super().__init__(*groups)
-        self.original_image = pygame.Surface((50, 50), pygame.SRCALPHA)
-        # pygame.draw.polygon(self.original_image, (255, 100, 100), [(0, 0), (25, 50), (50, 0)])
-        pygame.draw.rect(self.original_image, (255, 100, 100), pygame.Rect(0, 0, 50, 50))
+        self.original_image = pygame.Surface((50, 60), pygame.SRCALPHA)
+        pygame.draw.polygon(self.original_image, (255, 100, 100), [(self.original_image.get_width() // 2, 0), (0, self.original_image.get_height()), (self.original_image.get_width(), self.original_image.get_height())])
+        pygame.draw.rect(self.original_image, (100, 100, 100), pygame.Rect(self.original_image.get_width() // 2 - 5, self.original_image.get_height() - 10, 10, 10,)) # draws a little box on the triangles ^ bottom part
         self.image = self.original_image
         self.rect = self.image.get_rect()
         self.rect.center = (init_x, init_y)
-        self.paint_top_segment((100, 100, 100))
 
         # *** Physics ***
         print(config.__dict__)
@@ -32,16 +31,6 @@ class Spaceship(pygame.sprite.Sprite):
 
         # *** Control ***
         self.is_player = False
-        
-
-    def paint_top_segment(self, segment_color):
-        segment_width = 10  # Width of the top segment
-        segment_height = 10  # Height of the top segment
-    
-        top_segment = pygame.Surface((segment_width, segment_height), pygame.SRCALPHA)
-        pygame.draw.rect(top_segment, segment_color, (0, 0, segment_width, segment_height))
-    
-        self.image.blit(top_segment, (self.image.get_width() // 2 - segment_width // 2, 0))
 
 
     def up_fun(self):
