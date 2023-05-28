@@ -73,8 +73,8 @@ class Spaceship(pygame.sprite.Sprite):
         if keys[RIGHT] or keys[K_RIGHT]:
             self.right_fun()
         # calculate changes and update config
-        dist, vs, hs, acc, alt, fuel, weight = engine.main_calc(dt = dt, config = self.config)
-        self.config.update(dist = dist, vs = vs, hs = hs, acc = acc, alt = alt, fuel = fuel, dt = dt, weight = weight)
+        lat, vs, hs, acc, alt, fuel, weight = engine.main_calc(dt = dt, config = self.config)
+        self.config.update(lat = lat, vs = vs, hs = hs, acc = acc, alt = alt, fuel = fuel, dt = dt, weight = weight)
         self.update_position(dt = dt,screen_height=height)
         self.ensure_bounds(width = width, height = height)
 

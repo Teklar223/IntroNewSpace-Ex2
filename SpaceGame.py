@@ -8,7 +8,7 @@ from random import randint
 from Configuration import Configuration
 from Spaceship import Spaceship
 from Engine import Engine
-from Util import InputBox,to_pg_coords # to pygame (co-ordinates)
+from Util import InputBox,to_pg_coords, to_pg_angle # to pygame (co-ordinates)
 from pygame_functions import *
 from game_constants import *
 from Constants import *
@@ -26,7 +26,7 @@ def _config_zero():
             f"{c_horizontal_speed}": 0.0,
             f"{c_angle}": 90.0,
             f"{c_engine_power}": 0.0,
-            f"{c_distance}": 0.0
+            f"{c_latitude}": 0.0
         }
     return kwargs
 
@@ -149,33 +149,29 @@ class SpaceGame:
         scrollBackground(int(hs), -int(vs), self.bg, self.screen) # y is negative due to pygame
         # double negative is left for understanding :)
 
-    def render_arrow(self):
-            
+    def render_arrow(self,arrow):
+        moon_coordinates = [0, 0] # static target for easy calculations...
         x_arrow = 60
         y_arrow = 60
-        scroll = 0
-        tiles = math.ceil(self.screen.get_width() / bg.get_width()) + 1
-        x_space = int(self.screen.get_width() / 2)
-        y_space = int(self.screen.get_height() / 2)
-        moon_coordinates = [int(self.screen.get_width() / 2), -50000]
-        dx_space = 0
-        dy_space = 0
-        ang = self.config.angle
-        bg_speed = 5
-        dx_space = self.config.hs
-        dy_space = self.config.hs
+        #scroll = 0
+        #tiles = math.ceil(self.screen.get_width() / bg.get_width()) + 1
+        x_space = int(self.config.lat)
+        y_space = int(self.config.alt)
+        #dx_space = 0
+        #dy_space = 0
+        #ang = self.config.angle
+        #bg_speed = 5
+        #dx_space = self.config.hs
+        #dy_space = self.config.hs
         space_coordinates = [x_space, y_space]
-        if distance(space_coordinates, moon_coordinates) < 1000:
-            moon_coordinates[1] *= 2
-        arrow_angle = (get_angle(space_coordinates, moon_coordinates) - 90) % 360
-            # arrow_angle = 0
+        #if distance(space_coordinates, moon_coordinates) < 1000:
+        #    moon_coordinates[1] *= 2
+        arrow_angle = to_pg_angle(get_angle(space_coordinates, moon_coordinates))
         rotated_arrow = pygame.transform.rotate(arrow, arrow_angle)
         rotated_rectangle = rotated_arrow.get_rect(center=(x_arrow, y_arrow))
         self.screen.blit(rotated_arrow, rotated_rectangle)
 
     def startGame(self):
-        x = 0
-        y = 0
         bg = pygame.image.load('Media/background.jpg').convert()
         arrow = pygame.image.load('Media/arrow.png')
 
@@ -203,7 +199,7 @@ class SpaceGame:
             self.ship.update(engine=self.engine,dt = dt, width=self.screen.get_width(), height=self.screen.get_height())
             
             self.render_background()
-            #self.render_arrow()
+            self.render_arrow(arrow = arrow)
             self.render_config(self.ship.config)
             self.screen.blit(self.ship.image, self.ship.rect)
 

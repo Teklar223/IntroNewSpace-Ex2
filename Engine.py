@@ -47,10 +47,10 @@ class Engine():
             weight += fuel
             acc = config.thrust * self.accMax(weight)
 
-        dist = config.dist + hs * dt
+        lat = config.lat + hs * dt
         alt = config.alt + dt * vs
 
-        return dist,vs,hs,acc,alt,fuel, weight
+        return lat,vs,hs,acc,alt,fuel, weight
         
 
             

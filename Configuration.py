@@ -14,8 +14,8 @@ class Configuration():
         # self.dt = kwargs.get(c_time_change, 1.0)  # sec
         self.vs = kwargs.get(c_vertical_speed, 24.8)
         self.hs = kwargs.get(c_horizontal_speed, 932)
-        self.dist = kwargs.get(c_distance, 181 * 1000)
         self.angle = kwargs.get(c_angle, 58.3)  # zero is vertical (as in landing)
+        self.lat = kwargs.get(c_latitude, 181 * 1000) # horizontal distance from target
         self.alt = kwargs.get(c_altitude, 13748)  # 2:25:40 (as in the simulation) # https://www.youtube.com/watch?v=JJ0VfRL9AMs
         self.acc = kwargs.get(c_acceleration, 0)  # Acceleration rate (m/s^2)
         self.fuel = kwargs.get(c_fuel, 121)  #     
