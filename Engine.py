@@ -34,21 +34,21 @@ class Engine():
         h_acc = math.cos(ang_rad) * config.acc
         v_acc = math.sin(ang_rad) * config.acc - Moon.getAcc(config.hs)
 
-        vs = config.vs - v_acc * dt
-        hs = config.hs - h_acc * dt
+        vs = config.vs + v_acc * dt
+        hs = config.hs + h_acc * dt
 
         dw = dt * self.all_burn * config.thrust
         fuel = config.fuel
         acc = 0 # if fuel <= 0
         weight = self.weight_emp
 
-        if config.fuel > 0:
-            fuel = config.fuel - dw
+        if fuel > 0:
+            fuel = fuel - dw
             weight += fuel
             acc = config.thrust * self.accMax(weight)
 
-        dist = config.dist - hs * dt
-        alt = config.alt - dt * vs
+        dist = config.dist + hs * dt
+        alt = config.alt + dt * vs
 
         return dist,vs,hs,acc,alt,fuel, weight
         

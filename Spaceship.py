@@ -68,6 +68,10 @@ class Spaceship(pygame.sprite.Sprite):
         self.rect.x = int(width / 2)
         self.rect.y = int(height / 2)
 
+    # def initiate_angle(self):
+    #     self.config.angle += 120
+    #     self.config.angle %= 360
+
 
     def update(self, dt, width, height, engine : Engine):
         keys = pygame.key.get_pressed()
@@ -82,10 +86,10 @@ class Spaceship(pygame.sprite.Sprite):
         # calculate changes and update config
         dist, vs, hs, acc, alt, fuel, weight = engine.main_calc(dt = dt, config = self.config)
         self.config.update(dist = dist, vs = vs, hs = hs, acc = acc, alt = alt, fuel = fuel, dt = dt, weight = weight)
-        self.update_position(dt = dt)
+        self.update_position(dt = dt,screen_height=height)
         self.ensure_bounds(width = width, height = height)
 
-    def update_position(self, dt):
+    def update_position(self,dt, screen_height):
         config = self.config
 
         dx = 0.01 * math.sin(math.radians(config.angle)) * config.hs
@@ -94,6 +98,18 @@ class Spaceship(pygame.sprite.Sprite):
         # Update the x and y coordinates
         ang = self.config.angle
         thrust = self.config.thrust
+        alt = self.config.alt
+        # TODO: check calculations
+        if alt <= screen_height:
+                if thrust >= 1.:
+                    self.rect.x += dx / 4
+                    self.rect.y += dy / 7
+                elif thrust <= 0:
+                    self.rect.x += dx
+                    self.rect.y += dy
+                else:
+                    self.rect.x += dx * thrust
+                    self.rect.y += dy * thrust
 
         # self.rect.x += config.hs * dt
         # self.rect.y += config.vs * dt
