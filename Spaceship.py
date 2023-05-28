@@ -4,6 +4,7 @@ import pygame
 import copy
 import math
 from Engine import Engine
+from Util import to_pg_angle
 
 # Constants
 UP = K_w
@@ -16,12 +17,12 @@ class Spaceship(pygame.sprite.Sprite):
 
         # *** Pygame ***
         super().__init__(*groups)
-        self.original_image = pygame.Surface((50, 50), pygame.SRCALPHA)
-        pygame.draw.polygon(self.original_image, (255, 100, 100), [(0, 0), (25, 50), (50, 0)])
+        self.original_image = pygame.Surface((50, 60), pygame.SRCALPHA)
+        pygame.draw.polygon(self.original_image, (255, 100, 100), [(self.original_image.get_width() // 2, 0), (0, self.original_image.get_height()), (self.original_image.get_width(), self.original_image.get_height())])
+        pygame.draw.rect(self.original_image, (100, 100, 100), pygame.Rect(self.original_image.get_width() // 2 - 5, self.original_image.get_height() - 10, 10, 10,)) # draws a little box on the triangles ^ bottom part
         self.image = self.original_image
         self.rect = self.image.get_rect()
         self.rect.center = (init_x, init_y)
-        self.paint_top_segment((100, 100, 100))
 
         # *** Physics ***
         print(config.__dict__)
@@ -31,43 +32,34 @@ class Spaceship(pygame.sprite.Sprite):
         # *** Control ***
         self.is_player = False
 
-    def paint_top_segment(self, segment_color):
-        segment_width = 10  # Width of the top segment
-        segment_height = 10  # Height of the top segment
-    
-        top_segment = pygame.Surface((segment_width, segment_height), pygame.SRCALPHA)
-        pygame.draw.rect(top_segment, segment_color, (0, 0, segment_width, segment_height))
-    
-        self.image.blit(top_segment, (self.image.get_width() // 2 - segment_width // 2, 0))
-
 
     def up_fun(self):
-        print("UP")
-        self.config.NN = min(1.0, self.config.NN + 0.1)
-        print("NN = ", self.config.NN)
+        self.config.thrust = min(1.0, self.config.thrust + 0.1)
 
     def down_fun(self):
-        print("DOWN")
-        self.config.NN = max(0.0, self.config.NN - 0.1)
+        self.config.thrust = max(0.0, self.config.thrust - 0.1)
     
     def left_fun(self):
-        print("LEFT")
-        self.config.angle = (self.config.angle + 0.8) % 360 # (self.config.angle + 3) % 360
+        self.config.angle = (self.config.angle + 3) % 360 # (self.config.angle + 3) % 360
         self.rotate_ship()
 
     def right_fun(self):
-        print("RIGHT")
-        self.config.angle = (self.config.angle - 0.8) % 360
+        self.config.angle = (self.config.angle - 3) % 360
         self.rotate_ship()
         
 
     def rotate_ship(self):
-        self.image = pygame.transform.rotate(self.original_image, self.config.angle)
+        angle = to_pg_angle(self.config.angle)
+        self.image = pygame.transform.rotate(self.original_image, angle)
         self.rect = self.image.get_rect(center=self.rect.center)
 
     def set_first_position(self, width: int, height: int):
         self.rect.x = int(width / 2)
         self.rect.y = int(height / 2)
+
+    # def initiate_angle(self):
+    #     self.config.angle += 120
+    #     self.config.angle %= 360
 
 
     def update(self, dt, width, height, engine : Engine):
@@ -81,43 +73,32 @@ class Spaceship(pygame.sprite.Sprite):
         if keys[RIGHT] or keys[K_RIGHT]:
             self.right_fun()
         # calculate changes and update config
-        dist,vs,hs,acc,alt,fuel,weight = engine.main_calc(dt = dt, config = self.config)
-        self.config.update(dist = dist, vs = vs, hs = hs, acc = acc, alt = alt, fuel = fuel, dt = dt, weight = weight)
-        self.update_position(dt = dt)
+        lat, vs, hs, acc, alt, fuel, weight = engine.main_calc(dt = dt, config = self.config)
+        self.config.update(lat = lat, vs = vs, hs = hs, acc = acc, alt = alt, fuel = fuel, dt = dt, weight = weight)
+        self.update_position(dt = dt,screen_height=height)
         self.ensure_bounds(width = width, height = height)
 
-    def update_position(self, dt):
+    def update_position(self,dt, screen_height):
         config = self.config
-        if self.config.NN == 0.:
-            print(self.config)
 
         dx = 0.01 * math.sin(math.radians(config.angle)) * config.hs
         dy = 0.01 * math.cos(math.radians(config.angle)) * config.hs # Negative sign due to the inverted y-axis of pygame
         
         # Update the x and y coordinates
         ang = self.config.angle
-        nn = self.config.NN
-        # if 175 <= ang <= 185:
-        #     if nn >= 1.:
-        #         self.rect.x -= dx / 4
-        #         self.rect.y -= dy / 7
-        #     elif nn <= 0:
-        #         self.rect.x -= dx
-        #         self.rect.y -= dy
-        #     else:
-        #         self.rect.x -= dx * (1 - nn)
-        #         self.rect.y -= dy * (1 - nn)
-        # else:
-        #     if nn >= 1.:
-        #         self.rect.x += dx / 4
-        #         self.rect.y += dy / 7
-        #     elif nn <= 0:
-        #         self.rect.x += dx
-        #         self.rect.y += dy
-        #     else:
-        #         self.rect.x += dx * (1 - nn)
-        #         self.rect.y += dy * (1 - nn)
-
+        thrust = self.config.thrust
+        alt = self.config.alt
+        # TODO: check calculations
+        if alt <= screen_height:
+                if thrust >= 1.:
+                    self.rect.x += dx / 4
+                    self.rect.y += dy / 7
+                elif thrust <= 0:
+                    self.rect.x += dx
+                    self.rect.y += dy
+                else:
+                    self.rect.x += dx * thrust
+                    self.rect.y += dy * thrust
 
         # self.rect.x += config.hs * dt
         # self.rect.y += config.vs * dt
