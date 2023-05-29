@@ -9,7 +9,8 @@ c_second_eng_f = "second_eng_f"
 c_main_burn = "main_burn"
 c_second_burn = "second_burn"
 # c_all_burn = "all_burn"
-c_time_change = "time_change" # dt = change/differnece in time
+c_dt= "dt" # dt = change/differnece in time
+c_time = "time" # for total time variable (time = sum of all dt)
 c_vertical_speed = "vertical_speed"
 c_horizontal_speed = "horizontal_speed"
 # c_distance = "distance"

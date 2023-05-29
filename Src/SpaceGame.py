@@ -8,7 +8,7 @@ from random import randint
 from Src.Configuration import Configuration
 from Src.Spaceship import Spaceship
 from Src.Engine import Engine
-from .Util.Util import InputBox,to_pg_coords, to_pg_angle # to pygame (co-ordinates)
+from .Util.Util import FONT, InputBox,to_pg_coords, to_pg_angle # to pygame (co-ordinates)
 from .Util.pygame_functions import *
 from Src.game_constants import *
 from Src.Constants import *
@@ -45,6 +45,8 @@ class SpaceGame:
         self.config = Configuration(**_config_zero())  # Creates a default config
         self.target = (0,0)
         self.bg = Background()
+        self.ground_height = 0  # Define the ground height threshold
+        self.ground_color = (128, 128, 128)  # Define the color of the ground floor
 
     def _handle_events(self):
         for event in pygame.event.get():
@@ -160,6 +162,34 @@ class SpaceGame:
         rotated_rectangle = rotated_arrow.get_rect(center=(x_arrow, y_arrow))
         self.screen.blit(rotated_arrow, rotated_rectangle)
 
+    def render_time_factor(self, screen):
+        time_factor_text = FONT.render(f"X{self.ship.time_factor}", True, (255, 255, 255))
+        screen.blit(time_factor_text, (10, 10))  # Adjust the position as needed
+
+    def render_ground(self,screen):        
+        # Check if the ship is below the ground height threshold
+        if self.config.alt <= self.ground_height:
+            # Render the ground floor
+            ground_rect = pygame.Rect(0, self.ground_height, screen.get_width(), screen.get_height() - self.ground_height)
+            pygame.draw.rect(screen, self.ground_color, ground_rect)
+
+    def end_condition(self) -> bool:
+        alt = self.ship.config.alt
+        if alt > 0:
+            return True
+        else:
+            return False
+
+    def check_victory(self) -> bool:
+        vs    = self.ship.config.vs
+        hs    = self.ship.config.hs
+        angle = self.ship.config.angle
+        if -5 <= vs and -5 < hs < 5 and 85 < angle < 95:
+            return True
+        else:
+            return False 
+            
+
     def startGame(self):
         os.chdir("..") # CWD is Src/Util when runtime raches this point (for some reason)
         bg = pygame.image.load('Media/background.jpg').convert()
@@ -187,12 +217,21 @@ class SpaceGame:
             running = self._handle_events()
 
             self.ship.update(engine=self.engine,dt = dt, width=self.screen.get_width(), height=self.screen.get_height())
+            running = self.end_condition()
             
             self.render_background()
             self.render_arrow(arrow = arrow)
             self.render_config(self.ship.config)
+            self.render_time_factor(screen=self.screen)
+            self.render_ground(screen=self.screen)
             self.screen.blit(self.ship.image, self.ship.rect)
 
             pygame.display.flip()
 
+        self.EndGame()
+
+    def EndGame(self):
+        # TODO...
+        flag = self.check_victory()
+        print(flag)
         pygame.quit()

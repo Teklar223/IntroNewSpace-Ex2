@@ -27,8 +27,8 @@ class Configuration():
     def update(self, **kwargs):
         valid_attributes = set(vars(self).keys())
         for key, value in kwargs.items():
-            if key is "dt":
-                setattr(self,"time", self.time + value)
+            if key is c_dt: # special case for time change
+                setattr(self,c_time, self.time + value)
             if key in valid_attributes:
                 setattr(self, key, value)
 

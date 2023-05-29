@@ -25,9 +25,9 @@ class Spaceship(pygame.sprite.Sprite):
         self.rect.center = (init_x, init_y)
 
         # *** Physics ***
-        print(config.__dict__)
         self.config   =  config
-        self.velocity =  [config.hs, config.vs]
+        # self.velocity =  [config.hs, config.vs]
+        self.time_factor = 1 # determines the factor by which we multiply the dt (see speed_fun)
 
         # *** Control ***
         self.is_player = False
@@ -57,6 +57,22 @@ class Spaceship(pygame.sprite.Sprite):
         self.rect.x = int(width / 2)
         self.rect.y = int(height / 2)
 
+    def speed_func(self):
+        '''
+            if self.time_factor == 1:
+                self.time_factor +=1
+            else:
+                self.time_factor -=1
+        '''
+        if self.time_factor == 1:
+            self.time_factor = 10
+        else:
+            self.time_factor = 1
+
+    def check_landing(self, alt):
+        if alt <= 0:
+            alt = 0
+        return alt
 
     def update(self, dt, width, height, engine : Engine):
         keys = pygame.key.get_pressed()
@@ -69,9 +85,11 @@ class Spaceship(pygame.sprite.Sprite):
         if keys[RIGHT] or keys[K_RIGHT]:
             self.right_fun()
         if keys[K_x]:
-            pass # TODO: cycle between x1 and x2 for dt
+            self.speed_func()
         # calculate changes and update config
+        dt = dt * self.time_factor
         lat, vs, hs, acc, alt, fuel, weight = engine.main_calc(dt = dt, config = self.config)
+        alt = self.check_landing(alt = alt) # ensures alt >= 0
         self.config.update(lat = lat, vs = vs, hs = hs, acc = acc, alt = alt, fuel = fuel, dt = dt, weight = weight)
         self.update_position(dt = dt,screen_height=height)
         self.ensure_bounds(width = width, height = height)
