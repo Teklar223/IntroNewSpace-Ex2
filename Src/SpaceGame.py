@@ -12,7 +12,6 @@ from .Util.Util import InputBox,to_pg_coords, to_pg_angle # to pygame (co-ordina
 from .Util.pygame_functions import *
 from Src.game_constants import *
 from Src.Constants import *
-import sys  # TODO remove
 
 # wasd Constants
 UP = K_w
@@ -153,26 +152,16 @@ class SpaceGame:
         moon_coordinates = [0, 0] # static target for easy calculations...
         x_arrow = 60
         y_arrow = 60
-        #scroll = 0
-        #tiles = math.ceil(self.screen.get_width() / bg.get_width()) + 1
         x_space = int(self.config.lat)
         y_space = int(self.config.alt)
-        #dx_space = 0
-        #dy_space = 0
-        #ang = self.config.angle
-        #bg_speed = 5
-        #dx_space = self.config.hs
-        #dy_space = self.config.hs
         space_coordinates = [x_space, y_space]
-        #if distance(space_coordinates, moon_coordinates) < 1000:
-        #    moon_coordinates[1] *= 2
         arrow_angle = to_pg_angle(get_angle(space_coordinates, moon_coordinates))
         rotated_arrow = pygame.transform.rotate(arrow, arrow_angle)
         rotated_rectangle = rotated_arrow.get_rect(center=(x_arrow, y_arrow))
         self.screen.blit(rotated_arrow, rotated_rectangle)
 
     def startGame(self):
-        os.chdir("..")
+        os.chdir("..") # CWD is Src/Util when runtime raches this point (for some reason)
         bg = pygame.image.load('Media/background.jpg').convert()
         arrow = pygame.image.load('Media/arrow.png')
 
@@ -194,7 +183,7 @@ class SpaceGame:
         self.engine = Engine(self.config)
         running = True
         while running:
-            dt = self.clock.tick(30) / 800.0
+            dt = 1/self.clock.tick(60)
             running = self._handle_events()
 
             self.ship.update(engine=self.engine,dt = dt, width=self.screen.get_width(), height=self.screen.get_height())

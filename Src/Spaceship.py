@@ -57,10 +57,6 @@ class Spaceship(pygame.sprite.Sprite):
         self.rect.x = int(width / 2)
         self.rect.y = int(height / 2)
 
-    # def initiate_angle(self):
-    #     self.config.angle += 120
-    #     self.config.angle %= 360
-
 
     def update(self, dt, width, height, engine : Engine):
         keys = pygame.key.get_pressed()
@@ -72,6 +68,8 @@ class Spaceship(pygame.sprite.Sprite):
             self.left_fun()
         if keys[RIGHT] or keys[K_RIGHT]:
             self.right_fun()
+        if keys[K_x]:
+            pass # TODO: cycle between x1 and x2 for dt
         # calculate changes and update config
         lat, vs, hs, acc, alt, fuel, weight = engine.main_calc(dt = dt, config = self.config)
         self.config.update(lat = lat, vs = vs, hs = hs, acc = acc, alt = alt, fuel = fuel, dt = dt, weight = weight)
@@ -82,7 +80,7 @@ class Spaceship(pygame.sprite.Sprite):
         config = self.config
 
         dx = 0.01 * math.sin(math.radians(config.angle)) * config.hs
-        dy = 0.01 * math.cos(math.radians(config.angle)) * config.hs # Negative sign due to the inverted y-axis of pygame
+        dy = 0.01 * math.cos(math.radians(config.angle)) * config.hs
         
         # Update the x and y coordinates
         ang = self.config.angle
