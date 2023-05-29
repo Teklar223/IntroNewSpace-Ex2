@@ -25,7 +25,8 @@ def _config_zero():
             f"{c_horizontal_speed}": 0.0,
             f"{c_angle}": 90.0,
             f"{c_engine_power}": 0.0,
-            f"{c_latitude}": 0.0
+            f"{c_latitude}": 0.0,
+            f"{c_altitude}" : 1000
         }
     return kwargs
 
@@ -35,7 +36,7 @@ class SpaceGame:
     This is the 'Controller' of our simulation
     '''
 
-    def __init__(self, width=1600, height=600):
+    def __init__(self, width=1600, height=800):
         pygame.init()
         self.screen = pygame.display.set_mode((width, height))
         self.clock = pygame.time.Clock()
@@ -45,7 +46,6 @@ class SpaceGame:
         self.config = Configuration(**_config_zero())  # Creates a default config
         self.target = (0,0)
         self.bg = Background()
-        self.ground_height = 0  # Define the ground height threshold
         self.ground_color = (128, 128, 128)  # Define the color of the ground floor
 
     def _handle_events(self):
@@ -111,7 +111,7 @@ class SpaceGame:
                 running = False
 
     def set_config(self, key, value):
-        # todo: maybe more precise validation (per paramater?)
+        # TODO: maybe more precise validation (per paramater?)
         def is_number(s):
             try:
                 float(s)
@@ -144,11 +144,12 @@ class SpaceGame:
             self.screen.blit(text_surface, text_surface.get_rect())
 
     def render_background(self):
-        # get the opposite speeds (cause we want the image to go in the other direction the ships is 'going')
-        hs = -self.config.hs
-        vs = -self.config.vs
-        scrollBackground(int(hs), -int(vs), self.bg, self.screen) # y is negative due to pygame
-        # double negative is left for understanding :)
+        #if self.ship.config.alt > self.ground_threshold:
+            # get the opposite speeds (cause we want the image to go in the other direction the ships is 'going')
+            hs = -self.config.hs
+            vs = -self.config.vs
+            scrollBackground(int(hs), -int(vs), self.bg, self.screen) # y is negative due to pygame
+                                    # double negative is left for understanding :)
 
     def render_arrow(self,arrow):
         moon_coordinates = [0, 0] # static target for easy calculations...
@@ -168,10 +169,24 @@ class SpaceGame:
 
     def render_ground(self,screen):        
         # Check if the ship is below the ground height threshold
-        if self.config.alt <= self.ground_height:
+        alt = self.ship.config.alt
+        screen_height = self.screen.get_height()
+        if alt <= 0.5 * screen_height:
             # Render the ground floor
-            ground_rect = pygame.Rect(0, self.ground_height, screen.get_width(), screen.get_height() - self.ground_height)
+            ground_height = screen_height - self.calc_ground(alt, screen_height)
+            #left, top = to_pg_coords(x = 0, y = ground_height, canvas_height = screen_height)
+            #width, height = to_pg_coords(x = screen.get_width(), y = ground_height, canvas_height = screen_height)
+            ground_rect = pygame.Rect(0, ground_height, screen.get_width(), screen_height)
             pygame.draw.rect(screen, self.ground_color, ground_rect)
+
+    def calc_ground(self,alt, screen_height):
+        x1 = 0
+        y1 = 0.5 * screen_height
+        x2 = 0.5 * screen_height
+        y2 = 0
+        m = (y2 - y1) / (x2 - x1)
+        ground_height = m * alt + 0.5 * screen_height
+        return ground_height
 
     def end_condition(self) -> bool:
         alt = self.ship.config.alt
@@ -216,7 +231,11 @@ class SpaceGame:
             dt = 1/self.clock.tick(60)
             running = self._handle_events()
 
-            self.ship.update(engine=self.engine,dt = dt, width=self.screen.get_width(), height=self.screen.get_height())
+            self.ship.update(engine=self.engine,
+                             dt = dt,
+                             width=self.screen.get_width(),
+                             height=self.screen.get_height()
+                             )
             running = self.end_condition()
             
             self.render_background()
@@ -233,5 +252,14 @@ class SpaceGame:
     def EndGame(self):
         # TODO...
         flag = self.check_victory()
-        print(flag)
+        running = True
+        while running:
+            # dt = 1/self.clock.tick(60)
+            running = self._handle_events()
+            self.render_background()
+            #self.render_arrow(arrow = arrow)
+            self.render_config(self.ship.config)
+            #self.render_time_factor(screen=self.screen)
+            self.render_ground(screen=self.screen)
+            self.screen.blit(self.ship.image, self.ship.rect)
         pygame.quit()

@@ -88,36 +88,18 @@ class Spaceship(pygame.sprite.Sprite):
             self.speed_func()
         # calculate changes and update config
         dt = dt * self.time_factor
+        current_lat = self.config.lat
         lat, vs, hs, acc, alt, fuel, weight = engine.main_calc(dt = dt, config = self.config)
         alt = self.check_landing(alt = alt) # ensures alt >= 0
         self.config.update(lat = lat, vs = vs, hs = hs, acc = acc, alt = alt, fuel = fuel, dt = dt, weight = weight)
-        self.update_position(dt = dt,screen_height=height)
+        #self.update_position(screen_height = height, ground_height = g_height,threshold=threshold, dlat = current_lat - lat)
         self.ensure_bounds(width = width, height = height)
 
-    def update_position(self,dt, screen_height):
-        config = self.config
-
-        dx = 0.01 * math.sin(math.radians(config.angle)) * config.hs
-        dy = 0.01 * math.cos(math.radians(config.angle)) * config.hs
-        
-        # Update the x and y coordinates
-        ang = self.config.angle
-        thrust = self.config.thrust
+    def update_position(self,screen_height,ground_height, threshold, dlat):
         alt = self.config.alt
-        # TODO: check calculations
-        if alt <= screen_height:
-                if thrust >= 1.:
-                    self.rect.x += dx / 4
-                    self.rect.y += dy / 7
-                elif thrust <= 0:
-                    self.rect.x += dx
-                    self.rect.y += dy
-                else:
-                    self.rect.x += dx * thrust
-                    self.rect.y += dy * thrust
-
-        # self.rect.x += config.hs * dt
-        # self.rect.y += config.vs * dt
+        if alt < threshold:
+            self.rect.x -= dlat
+            self.rect.y = screen_height - ground_height - alt # pygame shenanigans
 
     def ensure_bounds(self, width, height):
         '''
