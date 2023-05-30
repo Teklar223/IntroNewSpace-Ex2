@@ -171,21 +171,23 @@ class SpaceGame:
         # Check if the ship is below the ground height threshold
         alt = self.ship.config.alt
         screen_height = self.screen.get_height()
-        if alt <= 0.5 * screen_height:
+        ship_height = self.ship.original_image.get_height()
+        threshold = 0.5 * screen_height - ship_height
+        if alt <= threshold:
             # Render the ground floor
-            ground_height = screen_height - self.calc_ground(alt, screen_height)
+            ground_height = screen_height - self.calc_ground(alt = alt, max_val = threshold)
             #left, top = to_pg_coords(x = 0, y = ground_height, canvas_height = screen_height)
             #width, height = to_pg_coords(x = screen.get_width(), y = ground_height, canvas_height = screen_height)
             ground_rect = pygame.Rect(0, ground_height, screen.get_width(), screen_height)
             pygame.draw.rect(screen, self.ground_color, ground_rect)
 
-    def calc_ground(self,alt, screen_height):
+    def calc_ground(self,alt, max_val):
         x1 = 0
-        y1 = 0.5 * screen_height
-        x2 = 0.5 * screen_height
+        y1 = max_val
+        x2 = max_val
         y2 = 0
         m = (y2 - y1) / (x2 - x1)
-        ground_height = m * alt + 0.5 * screen_height
+        ground_height = m * alt + max_val
         return ground_height
 
     def end_condition(self) -> bool:
