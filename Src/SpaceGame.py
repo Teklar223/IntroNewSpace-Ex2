@@ -1,6 +1,8 @@
 import math
+import os
 import random
-
+from Src.Util.SavePopUp import show_popup, run_popup
+from Src.Util.FileHandler import load, save
 from Src.GuidingArrow import get_angle, distance
 import pygame
 from pygame.locals import *
@@ -38,7 +40,7 @@ class SpaceGame:
     This is the 'Controller' of our simulation
     '''
 
-    def __init__(self, width=1600, height=800, ):
+    def __init__(self, width=1600, height=600, ):
         pygame.init()
         self.screen = pygame.display.set_mode((width, height))
         self.clock = pygame.time.Clock()
@@ -105,13 +107,14 @@ class SpaceGame:
 
             # Check if the start button is clicked
             if pygame.mouse.get_pressed()[0]:
-                
+
                 if start_button_rect.collidepoint(pygame.mouse.get_pos()):
                     self.config.is_player = True
                     input_boxes.clear()
                     self.startGame()
                     running = False
-                
+                    continue
+
                 if simulation_button_rect.collidepoint(pygame.mouse.get_pos()):
                     self.config.is_player = False
                     input_boxes.clear()
@@ -126,7 +129,9 @@ class SpaceGame:
 
     def select_file(self):
         # Other code...
-        path = os.path.join(os.getcwd, "Media")
+        file_path = load()
+        print(file_path)
+        path = os.path.join(os.getcwd(), "Media")
         print(path)
         path = os.path.join(path,"back_button.png")
         print(path)
@@ -163,13 +168,13 @@ class SpaceGame:
         button_text = self.font.render("Single Player", True, (0, 0, 0))
         button_text_rect = button_text.get_rect(center=rect.center)
         self.screen.blit(button_text, button_text_rect)
-    
+
     def draw_simulation(self, rect):
         pygame.draw.rect(self.screen, (0, 255, 0), rect)
         button_text = self.font.render("Simulate", True, (0, 0, 0))
         button_text_rect = button_text.get_rect(center=rect.center)
         self.screen.blit(button_text, button_text_rect)
-    
+
 
     def set_config(self, key, value):
         # TODO: maybe more precise validation (per paramater?)
@@ -228,7 +233,7 @@ class SpaceGame:
         time_factor_text = FONT.render(f"X{self.ship.time_factor}", True, (255, 255, 255))
         screen.blit(time_factor_text, (10, 10))  # Adjust the position as needed
 
-    def render_ground(self,screen):        
+    def render_ground(self,screen):
         # Check if the ship is below the ground height threshold
         alt = self.ship.config.alt
         screen_height = self.screen.get_height()
@@ -265,8 +270,8 @@ class SpaceGame:
         if -5 <= vs and -5 < hs < 5 and 85 < angle < 95:
             return True
         else:
-            return False 
-            
+            return False
+
 
     def startGame(self):
         os.chdir("..") # CWD is Src/Util when runtime raches this point (for some reason)
@@ -274,7 +279,7 @@ class SpaceGame:
         arrow = pygame.image.load('Media/arrow.png')
 
         arrow = pygame.transform.scale(arrow, (60, 100))
-        grid_size = 3
+        grid_size = 20
         grid = []
         for i in range(grid_size):
             row = [bg_name for i in range(grid_size)]
@@ -303,7 +308,7 @@ class SpaceGame:
                              )
             self.logger.log_csv(self.ship.config, active = self.config.is_player) # log after every update
             running = self.end_condition()
-            
+
             self.render_background()
             self.render_arrow(arrow = arrow)
             self.render_config(self.ship.config)
@@ -313,19 +318,26 @@ class SpaceGame:
 
             pygame.display.flip()
 
+
+        # run_popup(self.config)
+        pygame.display.update()
         self.EndGame()
 
     def EndGame(self):
         # TODO...
         flag = self.check_victory()
         running = True
-        while running:
-            # dt = 1/self.clock.tick(60)
-            running = self._handle_events()
-            self.render_background()
-            #self.render_arrow(arrow = arrow)
-            self.render_config(self.ship.config)
-            #self.render_time_factor(screen=self.screen)
-            self.render_ground(screen=self.screen)
-            self.screen.blit(self.ship.image, self.ship.rect)
+
+        out = show_popup(self.config)
+        # while running:
+        #     # dt = 1/self.clock.tick(60)
+        #     running = self._handle_events()
+        #     self.render_background()
+        #     #self.render_arrow(arrow = arrow)
+        #     self.render_config(self.ship.config)
+        #     #self.render_time_factor(screen=self.screen)
+        #     self.render_ground(screen=self.screen)
+        #     self.screen.blit(self.ship.image, self.ship.rect)
+        # if out is not None:
+        #     self.start()
         pygame.quit()

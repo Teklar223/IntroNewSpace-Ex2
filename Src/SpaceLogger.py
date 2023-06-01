@@ -8,7 +8,7 @@ class Logger():
         timestr = time.strftime("%Y-%m-%d-%H-%M-%S")
         self.filename = f"log_{timestr}_.csv"
 
-    def log_csv(self, config: Configuration, path: str = None, filename = None, active = True) -> None:
+    def log_csv(self, config: Configuration, path: str = None, filename = None, active = True, full_path=None) -> None:
         if not active: 
             return
         
@@ -24,6 +24,9 @@ class Logger():
 
         # Create the full path for the log file
         log_path = os.path.join(path, filename)
+
+        if full_path is not None:
+            log_path = full_path
 
         # Check if the log file already exists
         file_exists = os.path.isfile(log_path)
