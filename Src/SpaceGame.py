@@ -8,10 +8,11 @@ from random import randint
 from Src.Configuration import Configuration
 from Src.Spaceship import Spaceship
 from Src.Engine import Engine
-from .Util.Util import FONT, InputBox,to_pg_coords, to_pg_angle # to pygame (co-ordinates)
-from .Util.pygame_functions import *
+from Src.Util.Util import FONT, InputBox,to_pg_coords, to_pg_angle # to pygame (co-ordinates)
+from Src.Util.pygame_functions import *
 from Src.game_constants import *
 from Src.Constants import *
+from Src.SpaceLogger import Logger
 
 # wasd Constants
 UP = K_w
@@ -36,7 +37,7 @@ class SpaceGame:
     This is the 'Controller' of our simulation
     '''
 
-    def __init__(self, width=1600, height=800):
+    def __init__(self, width=1600, height=800, ):
         pygame.init()
         self.screen = pygame.display.set_mode((width, height))
         self.clock = pygame.time.Clock()
@@ -47,6 +48,7 @@ class SpaceGame:
         self.target = (0,0)
         self.bg = Background()
         self.ground_color = (128, 128, 128)  # Define the color of the ground floor
+        self.logger = Logger()
 
     def _handle_events(self):
         for event in pygame.event.get():
@@ -228,6 +230,7 @@ class SpaceGame:
         self.ship.rotate_ship()  # Rotate the ship to the correct angle to begin the simulation
         self.ship.set_first_position(self.screen.get_width(), self.screen.get_height())
         self.engine = Engine(self.config)
+        self.logger.log(self.ship.config) # once to log the starting condition
         running = True
         while running:
             dt = 1/self.clock.tick(60)
@@ -238,6 +241,7 @@ class SpaceGame:
                              width=self.screen.get_width(),
                              height=self.screen.get_height()
                              )
+            self.logger.log(self.ship.config) # log after every update
             running = self.end_condition()
             
             self.render_background()
