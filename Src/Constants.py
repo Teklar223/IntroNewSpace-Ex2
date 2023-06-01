@@ -20,3 +20,4 @@ c_latitude = "latitude"
 c_acceleration = "acceleration"
 c_fuel = "fuel"
 c_engine_power = "engine_power"
+c_is_player = "is_player" # matches Configurati

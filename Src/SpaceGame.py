@@ -76,6 +76,7 @@ class SpaceGame:
                 y_offset += 40
 
         start_button_rect = pygame.Rect(300, 200, 200, 100)  # Rect for the start button
+        simulation_button_rect = pygame.Rect(600, 200, 200, 100)  # Rect for the start button
         running = True
 
         while running:
@@ -91,10 +92,8 @@ class SpaceGame:
             self.screen.fill((255, 255, 255))
 
             # Draw the start button
-            pygame.draw.rect(self.screen, (0, 255, 0), start_button_rect)
-            start_button_text = self.font.render("Start", True, (0, 0, 0))
-            start_button_text_rect = start_button_text.get_rect(center=start_button_rect.center)
-            self.screen.blit(start_button_text, start_button_text_rect)
+            self.draw_single_player(start_button_rect)
+            self.draw_simulation(simulation_button_rect)
 
             # Render and blit configuration values
             for input_box in input_boxes:
@@ -104,13 +103,35 @@ class SpaceGame:
             pygame.display.flip()
 
             # Check if the start button is clicked
-            if pygame.mouse.get_pressed()[0] and start_button_rect.collidepoint(pygame.mouse.get_pos()):
-                # Update the configuration variables
-                # for input_box in input_boxes:
-                #    setattr(self.config, input_box.permatext, input_box.text)
-                input_boxes.clear()
-                self.startGame()
-                running = False
+            if pygame.mouse.get_pressed()[0]:
+                
+                if start_button_rect.collidepoint(pygame.mouse.get_pos()):
+                    self.config.is_player = True
+                    input_boxes.clear()
+                    self.startGame()
+                    running = False
+                
+                if simulation_button_rect.collidepoint(pygame.mouse.get_pos()):
+                    self.config.is_player = False
+                    input_boxes.clear()
+                    self.StartSim()
+                    running = False
+
+    def StartSim(self):
+        pass # TODO
+
+    def draw_single_player(self, rect):
+        pygame.draw.rect(self.screen, (0, 255, 0), rect)
+        button_text = self.font.render("Single Player", True, (0, 0, 0))
+        button_text_rect = button_text.get_rect(center=rect.center)
+        self.screen.blit(button_text, button_text_rect)
+    
+    def draw_simulation(self, rect):
+        pygame.draw.rect(self.screen, (0, 255, 0), rect)
+        button_text = self.font.render("Simulate", True, (0, 0, 0))
+        button_text_rect = button_text.get_rect(center=rect.center)
+        self.screen.blit(button_text, button_text_rect)
+    
 
     def set_config(self, key, value):
         # TODO: maybe more precise validation (per paramater?)
@@ -230,7 +251,8 @@ class SpaceGame:
         self.ship.rotate_ship()  # Rotate the ship to the correct angle to begin the simulation
         self.ship.set_first_position(self.screen.get_width(), self.screen.get_height())
         self.engine = Engine(self.config)
-        self.logger.log(self.ship.config) # once to log the starting condition
+        self.logger.log_csv(self.ship.config, active = self.config.is_player) # once to log the starting condition
+        # active is set this way becuase were reading from an existing CSV if were simulating
         running = True
         while running:
             dt = 1/self.clock.tick(60)
@@ -241,7 +263,7 @@ class SpaceGame:
                              width=self.screen.get_width(),
                              height=self.screen.get_height()
                              )
-            self.logger.log(self.ship.config) # log after every update
+            self.logger.log_csv(self.ship.config, active = self.config.is_player) # log after every update
             running = self.end_condition()
             
             self.render_background()
