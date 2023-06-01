@@ -47,10 +47,13 @@ class Logger():
         # Print the log entry for testing purposes
         print(log_entry)
 
-    def read_csv(self, desired_attributes):
+    def read_csv(self, filename, desired_attributes):
+        '''
+            returns a list of dictionaries containing the desired attributes, order is dictated by the lines of the csv file
+        '''
         parsed_data = []
 
-        with open(self.file_path, "r", newline="") as csv_file:
+        with open(filename, "r", newline="") as csv_file:
             reader = csv.DictReader(csv_file)
             
             for row in reader:
