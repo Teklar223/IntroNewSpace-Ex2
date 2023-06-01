@@ -17,7 +17,9 @@ class Spaceship(pygame.sprite.Sprite):
         # *** Pygame ***
         super().__init__(*groups)
         self.original_image = pygame.Surface((50, 50), pygame.SRCALPHA)
+        # self.original_image = pygame.image.load('Media/rocket.png')
         pygame.draw.polygon(self.original_image, (255, 100, 100), [(0, 0), (25, 50), (50, 0)])
+        pygame.image.load('Media/arrow.png')
         self.image = self.original_image
         self.rect = self.image.get_rect()
         self.rect.center = (init_x, init_y)

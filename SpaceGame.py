@@ -165,12 +165,19 @@ class SpaceGame:
         running = True
         speed_boost = 25
         bg_speed = 5
+        stop = False
         while running:
             event = random.randint(0, 1000)
             fuel = self.config.fuel
             alt = self.config.alt
             if alt <= 0 or fuel <= 0:
                 break
+            # if alt <= 13000 and stop is False:
+            #     stop = True
+            #     row = ['Media/moon.jpeg' for i in range(grid_size)]
+            #     grid.append(row)
+            #     self.bg.setTiles(tiles=grid, screen=self.screen)
+
             ticks = 60
             fps = self.clock.tick(ticks)
             dt = float(1 / ticks)
@@ -220,7 +227,7 @@ class SpaceGame:
             elif 275 <= ang <= 315:  # (+Left, -Up)
                 # scrollBackground(int(bg_speed), math.floor(-0.5 * bg_speed), self.bg, self.screen)
                 scrollBackground(int(bg_speed), int(bg_speed), self.bg, self.screen)
-                dx_space += int(bg_speed) /2
+                dx_space += int(bg_speed) / 2
                 dy_space += int(bg_speed) / 2
             elif 315 < ang <= 355:  # (-Left, +Up)
                 # scrollBackground(int(bg_speed), -int(bg_speed), self.bg, self.screen)
