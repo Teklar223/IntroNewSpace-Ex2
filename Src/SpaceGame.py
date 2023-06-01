@@ -13,6 +13,7 @@ from Src.Util.pygame_functions import *
 from Src.game_constants import *
 from Src.Constants import *
 from Src.SpaceLogger import Logger
+from Src.Util.BackButton import BackButton
 
 # wasd Constants
 UP = K_w
@@ -118,7 +119,44 @@ class SpaceGame:
                     running = False
 
     def StartSim(self):
-        pass # TODO
+        selected_file = self.select_file()
+        if selected_file:
+            # TODO: simulate via the file.
+            print("Selected file:", selected_file)
+
+    def select_file(self):
+        # Other code...
+        path = os.path.join(os.getcwd, "Media")
+        print(path)
+        path = os.path.join(path,"back_button.png")
+        print(path)
+        img = pygame.image.load(path)
+        back_button = BackButton((10, 10),img)  # Adjust the position of the button as needed
+
+        running = True
+
+        while running:
+            for event in pygame.event.get():
+                if event.type == QUIT:
+                    pygame.quit()
+                    return
+
+                # Handle keyboard events
+                if event.type == KEYDOWN:
+                    if event.key == K_ESCAPE or event.key == K_BACKSPACE:
+                        running = False
+
+                # Handle mouse events
+                if event.type == MOUSEBUTTONDOWN:
+                    mouse_pos = pygame.mouse.get_pos()
+                    if back_button.is_clicked(mouse_pos):
+                        running = False
+
+            # Other code...
+
+            back_button.draw(self.screen)
+
+            pygame.display.flip()
 
     def draw_single_player(self, rect):
         pygame.draw.rect(self.screen, (0, 255, 0), rect)
