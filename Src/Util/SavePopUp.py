@@ -18,7 +18,7 @@ BLACK = (0, 0, 0)
 yes_button = None
 no_button = None
 # Step 5: Create the popup function
-def show_popup(config):
+def show_popup(config, show_save = True) -> bool:
     global no_button
     global yes_button
     popup_width = 450
@@ -29,18 +29,19 @@ def show_popup(config):
     popup_surface = pygame.Surface((popup_width, popup_height))
     popup_surface.fill(WHITE)
     pygame.draw.rect(popup_surface, BLACK, (0, 0, popup_width, popup_height), 3)
-
     font = pygame.font.Font(None, 24)
-    text = font.render("Do you want to save the file?", True, BLACK)
-    text_rect = text.get_rect(center=(popup_width // 2, popup_height // 2 - 20))
-    popup_surface.blit(text, text_rect)
 
-    yes_button = pygame.Rect(20, popup_height - 50, 100, 30)
-    pygame.draw.rect(popup_surface, WHITE, yes_button)
-    pygame.draw.rect(popup_surface, BLACK, yes_button, 2)
-    yes_text = font.render("Save", True, BLACK)
-    yes_text_rect = yes_text.get_rect(center=yes_button.center)
-    popup_surface.blit(yes_text, yes_text_rect)
+    if show_save:
+        text = font.render("Do you want to save the file?", True, BLACK)
+        text_rect = text.get_rect(center=(popup_width // 2, popup_height // 2 - 20))
+        popup_surface.blit(text, text_rect)
+
+        yes_button = pygame.Rect(20, popup_height - 50, 100, 30)
+        pygame.draw.rect(popup_surface, WHITE, yes_button)
+        pygame.draw.rect(popup_surface, BLACK, yes_button, 2)
+        yes_text = font.render("Save", True, BLACK)
+        yes_text_rect = yes_text.get_rect(center=yes_button.center)
+        popup_surface.blit(yes_text, yes_text_rect)
 
     no_button = pygame.Rect(popup_width - 120, popup_height - 50, 100, 30)
     pygame.draw.rect(popup_surface, WHITE, no_button)
@@ -70,14 +71,14 @@ def show_popup(config):
                 # Convert mouse_pos to be relative to the popup surface
                 mouse_pos_rel = (mouse_pos[0] - popup_x, mouse_pos[1] - popup_y)
 
-                if yes_button.collidepoint(mouse_pos_rel):
-                    # Save button clicked
-                    file_dialog(config)
-                    return None
+                if yes_button:
+                    if yes_button.collidepoint(mouse_pos_rel).collidepoint(mouse_pos_rel):
+                        # Save button clicked
+                        file_dialog(config)
+                        return True # default behaviour instead of 'none'
 
                 if no_button.collidepoint(mouse_pos_rel):
-                    # No thanks button clicked
-                    sys.exit()
+                    return False
 
                 if menu_button.collidepoint(mouse_pos_rel):
                     return True

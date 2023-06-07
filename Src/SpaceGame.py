@@ -72,6 +72,7 @@ class SpaceGame:
 
     def startMenu(self):
         self.clear_screen()
+        self.config = Configuration(**_config_zero())
         input_boxes = []  # List to store the input boxes
 
         # Create input boxes for each configuration variable
@@ -158,7 +159,7 @@ class SpaceGame:
             self.engine = Engine(self.config)
 
             running = True
-            log_index = 0
+            i = 0
 
             while running:
                 for event in pygame.event.get():
@@ -201,6 +202,8 @@ class SpaceGame:
                 back_button.draw(self.screen)
 
                 pygame.display.flip()
+            
+            self.EndGame(is_sim = True)
         else:
             return # file not valid
 
@@ -372,21 +375,13 @@ class SpaceGame:
         pygame.display.update()
         self.EndGame()
 
-    def EndGame(self):
+    def EndGame(self, is_sim = False):
         # TODO...
         flag = self.check_victory()
         running = True
 
-        out = show_popup(self.config)
-        # while running:
-        #     # dt = 1/self.clock.tick(60)
-        #     running = self._handle_events()
-        #     self.render_background()
-        #     #self.render_arrow(arrow = arrow)
-        #     self.render_config(self.ship.config)
-        #     #self.render_time_factor(screen=self.screen)
-        #     self.render_ground(screen=self.screen)
-        #     self.screen.blit(self.ship.image, self.ship.rect)
-        # if out is not None:
-        #     self.start()
-        pygame.quit()
+        out = show_popup(self.config, show_save = not is_sim)
+        if out:
+            self.startMenu()
+        else:
+            pygame.quit()
