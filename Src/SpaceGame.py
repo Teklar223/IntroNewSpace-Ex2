@@ -1,4 +1,4 @@
-import math
+import csv
 import os
 import random
 from Src.Util.SavePopUp import show_popup, run_popup
@@ -22,6 +22,7 @@ UP = K_w
 DOWN = K_s
 LEFT = K_a
 RIGHT = K_d
+
 
 def _config_zero():
     kwargs = {
@@ -61,10 +62,16 @@ class SpaceGame:
 
         return True
 
+    
+    def clear_screen(self, R = 255, G = 255, B = 255):
+        self.screen.fill((R, G, B))  # Fill the screen with black color
+
     def start(self):
+        os.chdir("..") # CWD is Src/Util when runtime raches this point (for some reason)
         self.startMenu()
 
     def startMenu(self):
+        self.clear_screen()
         input_boxes = []  # List to store the input boxes
 
         # Create input boxes for each configuration variable
@@ -122,46 +129,88 @@ class SpaceGame:
                     running = False
 
     def StartSim(self):
+        self.clear_screen()
         selected_file = self.select_file()
-        if selected_file:
-            # TODO: simulate via the file.
-            print("Selected file:", selected_file)
+        config_list = self.load_file(file_object = selected_file)
+        if config_list:
+            img_path = os.path.join(os.getcwd(), "Media")
+            img_path = os.path.join(img_path,"back_button.png")
+            img = pygame.image.load(img_path)
+            back_button = BackButton((10, 10),img)
+            bg = pygame.image.load('Media/background.jpg').convert()
+            arrow = pygame.image.load('Media/arrow.png')
 
+            arrow = pygame.transform.scale(arrow, (60, 100))
+            grid_size = 20
+            grid = []
+            for i in range(grid_size):
+                row = [bg_name for i in range(grid_size)]
+                grid.append(row)
+            event_i = random.randint(0, grid_size - 1)
+            event_j = random.randint(0, grid_size - 1)
+            grid[event_i][event_j] = death_star
+            # self.bg.setTiles(tiles=[bg_name, 'Media/death_star.jpeg', 'Media/knowhere.jpg'], screen=self.screen)
+            self.bg.setTiles(tiles=grid, screen=self.screen)
+            x, y = to_pg_coords(self.screen.get_width() / 2, 0.9 * self.screen.get_height(), self.screen.get_height())
+            self.ship = Spaceship(self.config, init_x=x, init_y=y)
+            self.ship.rotate_ship()  # Rotate the ship to the correct angle to begin the simulation
+            self.ship.set_first_position(self.screen.get_width(), self.screen.get_height())
+            self.engine = Engine(self.config)
+
+            running = True
+            log_index = 0
+
+            while running:
+                for event in pygame.event.get():
+                    if event.type == QUIT:
+                        pygame.quit()
+                        return
+
+                    # Handle keyboard events
+                    if event.type == KEYDOWN:
+                        if event.key == K_ESCAPE:
+                            running = False
+                        elif event.key == K_BACKSPACE:
+                            running = False
+                            self.startMenu() # return to main menu
+
+                    # Handle mouse events
+                    if event.type == MOUSEBUTTONDOWN:
+                        mouse_pos = pygame.mouse.get_pos()
+                        if back_button.is_clicked(mouse_pos):
+                            running = False
+                            self.startMenu() # return to main menu
+
+                dt = 1/self.clock.tick(60)
+                self.ship.config.update(**config_list[i])
+                i += 1
+                self.ship.update(engine=self.engine,
+                                dt = dt,
+                                width=self.screen.get_width(),
+                                height=self.screen.get_height(),
+                                player_input = False
+                                )
+                running = self.end_condition()
+
+                self.render_background()
+                self.render_arrow(arrow = arrow)
+                self.render_config(self.ship.config)
+                self.render_time_factor(screen=self.screen)
+                self.render_ground(screen=self.screen)
+                self.screen.blit(self.ship.image, self.ship.rect)
+                back_button.draw(self.screen)
+
+                pygame.display.flip()
+        else:
+            return # file not valid
+
+    def load_file(self, file_object):
+        arr_of_dict = [{k: float(v) for k, v in row.items()} for row in csv.DictReader(file_object, skipinitialspace=True)]
+        return arr_of_dict
+    
     def select_file(self):
-        # Other code...
         file_path = load()
-        print(file_path)
-        path = os.path.join(os.getcwd(), "Media")
-        print(path)
-        path = os.path.join(path,"back_button.png")
-        print(path)
-        img = pygame.image.load(path)
-        back_button = BackButton((10, 10),img)  # Adjust the position of the button as needed
-
-        running = True
-
-        while running:
-            for event in pygame.event.get():
-                if event.type == QUIT:
-                    pygame.quit()
-                    return
-
-                # Handle keyboard events
-                if event.type == KEYDOWN:
-                    if event.key == K_ESCAPE or event.key == K_BACKSPACE:
-                        running = False
-
-                # Handle mouse events
-                if event.type == MOUSEBUTTONDOWN:
-                    mouse_pos = pygame.mouse.get_pos()
-                    if back_button.is_clicked(mouse_pos):
-                        running = False
-
-            # Other code...
-
-            back_button.draw(self.screen)
-
-            pygame.display.flip()
+        return file_path
 
     def draw_single_player(self, rect):
         pygame.draw.rect(self.screen, (0, 255, 0), rect)
@@ -274,7 +323,7 @@ class SpaceGame:
 
 
     def startGame(self):
-        os.chdir("..") # CWD is Src/Util when runtime raches this point (for some reason)
+        self.clear_screen()
         bg = pygame.image.load('Media/background.jpg').convert()
         arrow = pygame.image.load('Media/arrow.png')
 

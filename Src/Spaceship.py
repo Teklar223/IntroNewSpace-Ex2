@@ -76,18 +76,23 @@ class Spaceship(pygame.sprite.Sprite):
             alt = 0
         return alt
 
-    def update(self, dt, width, height, engine : Engine):
+    def update(self, dt, width, height, engine : Engine, player_input = True):
         keys = pygame.key.get_pressed()
         if keys[UP] or keys[K_UP]:
-            self.up_fun()
+            if player_input:
+                self.up_fun()
         if keys[DOWN] or keys[K_DOWN]:
-            self.down_fun()
+            if player_input:
+                self.down_fun()
         if keys[LEFT] or keys[K_LEFT]:
-            self.left_fun()
+            if player_input:
+                self.left_fun()
         if keys[RIGHT] or keys[K_RIGHT]:
-            self.right_fun()
+            if player_input:
+                self.right_fun()
         if keys[K_x]:
-            self.speed_func()
+            if player_input:
+                self.speed_func()
         # calculate changes and update config
         dt = dt * self.time_factor
         current_lat = self.config.lat
