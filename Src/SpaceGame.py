@@ -18,7 +18,7 @@ from Src.game_constants import *
 from Src.Constants import *
 from Src.SpaceLogger import Logger
 from Src.Util.BackButton import BackButton
-
+from Src.Util.FileHandler import save, load
 # wasd Constants
 UP = K_w
 DOWN = K_s
@@ -165,14 +165,13 @@ class SpaceGame:
                     running = False
 
                 if save_config_rect.collidepoint(pygame.mouse.get_pos()):
-                    # 1. file browser
-                    # 2. save to path (with json)
-                    pass
+                    path = save()
+                    self.logger.log_csv([self.config],path = path, active = True)
                 
                 if load_config_rect.collidepoint(pygame.mouse.get_pos()):
-                    # 1 file browser
-                    # 2 load by path
-                    pass
+                    path = load()
+                    dict = self.load_csv_file(file_object=path)[0]
+                    self.config.update(dict)
 
     def StartSim(self):
         self.clear_screen()
