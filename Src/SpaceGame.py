@@ -134,6 +134,16 @@ class SpaceGame:
                     self.StartSim()
                     running = False
 
+                if save_config_rect.collidepoint(pygame.mouse.get_pos()):
+                    # 1. file browser
+                    # 2. save to path (with json)
+                    pass
+                
+                if load_config_rect.collidepoint(pygame.mouse.get_pos()):
+                    # 1 file browser
+                    # 2 load by path
+                    pass
+
     def StartSim(self):
         self.clear_screen()
         selected_file = self.select_file()
@@ -201,7 +211,6 @@ class SpaceGame:
                 self.render_background()
                 self.render_arrow(arrow = arrow)
                 self.render_config(self.ship.config)
-                self.render_time_factor(screen=self.screen)
                 self.render_ground(screen=self.screen)
                 self.screen.blit(self.ship.image, self.ship.rect)
                 back_button.draw(self.screen)
