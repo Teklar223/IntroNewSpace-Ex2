@@ -74,7 +74,7 @@ class SpaceGame:
     def startMenu(self):
         self.clear_screen()
         self.config = Configuration(**_config_zero())
-        bg = pygame.image.load('Media/background.jpg').convert()
+        bg = pygame.image.load('Media/background.jpg') # .convert()
         input_boxes = []  # List to store the input boxes
 
         # Create input boxes for each configuration variable
@@ -88,10 +88,13 @@ class SpaceGame:
                 input_boxes.append(input_box)
                 y_offset += 40
 
-        start_button_rect = pygame.Rect(300, 200, 200, 100)  # Rect for the start button
-        simulation_button_rect = pygame.Rect(600, 200, 200, 100)  # Rect for the start button
-        save_config_rect = pygame.Rect(self.screen.get_width() - 200,y_offset,50,50)
-        load_config_rect = pygame.Rect(self.screen.get_width() - 100,y_offset,50,50)
+        start_button_rect = pygame.Rect(self.screen.get_width()/2, 200, 200, 100)  # Rect for the start button
+        start_button_rect.center = (self.screen.get_width()/2,200)
+        simulation_button_rect = pygame.Rect(self.screen.get_width()/2, 300, 200, 100)  # Rect for the start button
+        simulation_button_rect.center = (self.screen.get_width()/2,350)
+        
+        save_config_rect = pygame.Rect(self.screen.get_width() - 200,y_offset,75,50)
+        load_config_rect = pygame.Rect(self.screen.get_width() - 100,y_offset,75,50)
         running = True
 
         while running:
@@ -105,6 +108,7 @@ class SpaceGame:
                     input_box.handle_event(event, self.set_config)
 
             self.screen.fill((255, 255, 255))
+            self.screen.blit(bg, (0,0))
 
             # Draw the start button
             self.draw_single_player(start_button_rect)
@@ -147,7 +151,7 @@ class SpaceGame:
     def StartSim(self):
         self.clear_screen()
         selected_file = self.select_file()
-        config_list = self.load_file(file_object = selected_file)
+        config_list = self.load_csv_file(file_object = selected_file)
         if config_list:
             img_path = os.path.join(os.getcwd(), "Media")
             img_path = os.path.join(img_path,"back_button.png")
@@ -221,9 +225,14 @@ class SpaceGame:
         else:
             return # file not valid
 
-    def load_file(self, file_object):
+    def load_csv_file(self, file_object):
         arr_of_dict = [{k: float(v) for k, v in row.items()} for row in csv.DictReader(file_object, skipinitialspace=True)]
         return arr_of_dict
+    
+    def load_json_file(self, file_object):
+        # TODO
+        dict = {}
+        return dict
     
     def select_file(self):
         file_path = load()
