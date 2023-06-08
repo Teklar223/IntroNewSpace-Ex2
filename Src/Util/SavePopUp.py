@@ -23,8 +23,8 @@ def show_popup(config_list: list, show_save = True) -> bool:
     global yes_button
     popup_width = 450
     popup_height = 150
-    popup_x = (screen.get_width() - popup_width) // 2
-    popup_y = (screen.get_height() - popup_height) // 2
+    popup_x = int((screen.get_width() - popup_width) // 2)
+    popup_y = int((screen.get_height() - popup_height) - 50)
 
     popup_surface = pygame.Surface((popup_width, popup_height))
     popup_surface.fill(WHITE)
