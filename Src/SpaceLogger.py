@@ -8,7 +8,7 @@ class Logger():
         timestr = time.strftime("%Y-%m-%d-%H-%M-%S")
         self.filename = f"log_{timestr}_.csv"
 
-    def log_csv(self, config: Configuration, path: str = None, filename = None, active = True, full_path=None) -> None:
+    def log_csv(self, configs: list, path: str = None, filename = None, active = True, full_path=None) -> None:
         if not active: 
             return
         
@@ -32,7 +32,7 @@ class Logger():
         file_exists = os.path.isfile(log_path)
 
         # Specify the attributes to include in the log entry
-        attributes = [key for (key,_) in config.__dict__.items()]
+        attributes = [key for (key,_) in configs[0].__dict__.items()]
         attributes.remove(c_is_player)
 
         # Open the log file in append mode and write the log entry
@@ -44,11 +44,12 @@ class Logger():
                 writer.writeheader()
 
             # Extract the attribute values and write the log entry
-            log_entry = {attr: getattr(config, attr) for attr in attributes}
-            writer.writerow(log_entry)
+            for config in configs:
+                log_entry = {attr: getattr(config, attr) for attr in attributes}
+                writer.writerow(log_entry)
 
         # Print the log entry for testing purposes
-        print(log_entry)
+        # print(log_entry)
 
     def read_csv(self, filename, desired_attributes):
         '''

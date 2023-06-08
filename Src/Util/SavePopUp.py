@@ -18,7 +18,7 @@ BLACK = (0, 0, 0)
 yes_button = None
 no_button = None
 # Step 5: Create the popup function
-def show_popup(config, show_save = True) -> bool:
+def show_popup(config_list: list, show_save = True) -> bool:
     global no_button
     global yes_button
     popup_width = 450
@@ -71,10 +71,10 @@ def show_popup(config, show_save = True) -> bool:
                 # Convert mouse_pos to be relative to the popup surface
                 mouse_pos_rel = (mouse_pos[0] - popup_x, mouse_pos[1] - popup_y)
 
-                if yes_button:
-                    if yes_button.collidepoint(mouse_pos_rel).collidepoint(mouse_pos_rel):
+                if yes_button is not None:
+                    if yes_button.collidepoint(mouse_pos_rel):
                         # Save button clicked
-                        file_dialog(config)
+                        file_dialog(config_list)
                         return True # default behaviour instead of 'none'
 
                 if no_button.collidepoint(mouse_pos_rel):
@@ -113,12 +113,12 @@ def handle_popup(config):
 
 
 # Step 7: Create the file save dialog function
-def file_dialog(config):
+def file_dialog(config_list: list):
     # Add your file save dialog code here
     # This is just a placeholder
     path = save()
     logger = Logger()
-    logger.log_csv(config=config, full_path=path)
+    logger.log_csv(configs=config_list, full_path=path)
     print("File save dialog")
 
 

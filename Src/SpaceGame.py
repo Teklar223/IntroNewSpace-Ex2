@@ -1,6 +1,7 @@
 import csv
 import os
 import random
+from copy import deepcopy
 from Src.Util.SavePopUp import show_popup, run_popup
 from Src.Util.FileHandler import load, save
 from Src.GuidingArrow import get_angle, distance
@@ -329,7 +330,7 @@ class SpaceGame:
         self.clear_screen()
         bg = pygame.image.load('Media/background.jpg').convert()
         arrow = pygame.image.load('Media/arrow.png')
-
+        config_list = [deepcopy(self.config)]
         arrow = pygame.transform.scale(arrow, (60, 100))
         grid_size = 20
         grid = []
@@ -346,7 +347,7 @@ class SpaceGame:
         self.ship.rotate_ship()  # Rotate the ship to the correct angle to begin the simulation
         self.ship.set_first_position(self.screen.get_width(), self.screen.get_height())
         self.engine = Engine(self.config)
-        self.logger.log_csv(self.ship.config, active = self.config.is_player) # once to log the starting condition
+        self.logger.log_csv([self.ship.config], active = self.config.is_player) # once to log the starting condition
         # active is set this way becuase were reading from an existing CSV if were simulating
         running = True
         while running:
@@ -358,7 +359,7 @@ class SpaceGame:
                              width=self.screen.get_width(),
                              height=self.screen.get_height()
                              )
-            self.logger.log_csv(self.ship.config, active = self.config.is_player) # log after every update
+            # self.logger.log_csv(self.ship.config, active = self.config.is_player) # log after every update
             running = self.end_condition()
 
             self.render_background()
@@ -367,20 +368,21 @@ class SpaceGame:
             self.render_time_factor(screen=self.screen)
             self.render_ground(screen=self.screen)
             self.screen.blit(self.ship.image, self.ship.rect)
+            config_list.append(deepcopy(self.config))
 
             pygame.display.flip()
 
 
         # run_popup(self.config)
         pygame.display.update()
-        self.EndGame()
+        self.EndGame(config_list=config_list)
 
-    def EndGame(self, is_sim = False):
+    def EndGame(self, config_list: list, is_sim = False):
         # TODO...
         flag = self.check_victory()
         running = True
 
-        out = show_popup(self.config, show_save = not is_sim)
+        out = show_popup(config_list, show_save = not is_sim)
         if out:
             self.startMenu()
         else:
