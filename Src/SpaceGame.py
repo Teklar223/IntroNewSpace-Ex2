@@ -391,7 +391,7 @@ class SpaceGame:
         pygame.display.update()
         self.EndGame(config_list=config_list)
 
-    def EndGame(self, config_list: list, is_sim = False):
+    def EndGame(self, config_list: list = None, is_sim = False):
         # TODO...
         flag = self.check_victory()
         running = True

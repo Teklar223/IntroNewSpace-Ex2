@@ -43,11 +43,9 @@ class Spaceship(pygame.sprite.Sprite):
     
     def left_fun(self):
         self.config.angle = (self.config.angle + 3) % 360 # (self.config.angle + 3) % 360
-        self.rotate_ship()
 
     def right_fun(self):
         self.config.angle = (self.config.angle - 3) % 360
-        self.rotate_ship()
         
 
     def rotate_ship(self):
@@ -94,6 +92,7 @@ class Spaceship(pygame.sprite.Sprite):
             if player_input:
                 self.speed_func()
         # calculate changes and update config
+        self.rotate_ship()
         dt = dt * self.time_factor
         current_lat = self.config.lat
         lat, vs, hs, acc, alt, fuel, weight = engine.main_calc(dt = dt, config = self.config)
