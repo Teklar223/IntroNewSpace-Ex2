@@ -73,6 +73,7 @@ class SpaceGame:
     def startMenu(self):
         self.clear_screen()
         self.config = Configuration(**_config_zero())
+        bg = pygame.image.load('Media/background.jpg').convert()
         input_boxes = []  # List to store the input boxes
 
         # Create input boxes for each configuration variable
@@ -88,6 +89,8 @@ class SpaceGame:
 
         start_button_rect = pygame.Rect(300, 200, 200, 100)  # Rect for the start button
         simulation_button_rect = pygame.Rect(600, 200, 200, 100)  # Rect for the start button
+        save_config_rect = pygame.Rect(self.screen.get_width() - 200,y_offset,50,50)
+        load_config_rect = pygame.Rect(self.screen.get_width() - 100,y_offset,50,50)
         running = True
 
         while running:
@@ -105,6 +108,7 @@ class SpaceGame:
             # Draw the start button
             self.draw_single_player(start_button_rect)
             self.draw_simulation(simulation_button_rect)
+            self.draw_save_and_load(save_rect= save_config_rect, load_rect= load_config_rect)
 
             # Render and blit configuration values
             for input_box in input_boxes:
@@ -214,6 +218,16 @@ class SpaceGame:
     def select_file(self):
         file_path = load()
         return file_path
+
+    def draw_save_and_load(self, save_rect, load_rect):
+        pygame.draw.rect(self.screen, (0, 255, 0), save_rect)
+        button_text = self.font.render("Save", True, (0, 0, 0))
+        button_text_rect = button_text.get_rect(center=save_rect.center)
+        self.screen.blit(button_text, button_text_rect)
+        pygame.draw.rect(self.screen, (0, 255, 0), load_rect)
+        button_text = self.font.render("Load", True, (0, 0, 0))
+        button_text_rect = button_text.get_rect(center=load_rect.center)
+        self.screen.blit(button_text, button_text_rect)
 
     def draw_single_player(self, rect):
         pygame.draw.rect(self.screen, (0, 255, 0), rect)
