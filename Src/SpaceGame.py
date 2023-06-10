@@ -114,7 +114,7 @@ class SpaceGame:
                 input_box = InputBox(x, y_offset, 200, 30, text=str(value), permatext=permatxt)
                 input_boxes.append(input_box)
                 y_offset += 40
-        title_font = pygame.font.Font(None, 48)
+        title_font = pygame.font.Font(None, 56)
         title_surface = title_font.render("Space Simulation", True, (255, 255, 255))
         title_pos = (self.screen.get_width()/2,100)
         title_rect = title_surface.get_rect(center=title_pos)
@@ -273,11 +273,12 @@ class SpaceGame:
         return file_path
 
     def draw_save_and_load(self, save_rect, load_rect):
-        pygame.draw.rect(self.screen, (0, 255, 0), save_rect)
+        color = (182,23,235)
+        pygame.draw.rect(self.screen, color, save_rect)
         button_text = self.font.render("Save", True, (0, 0, 0))
         button_text_rect = button_text.get_rect(center=save_rect.center)
         self.screen.blit(button_text, button_text_rect)
-        pygame.draw.rect(self.screen, (0, 255, 0), load_rect)
+        pygame.draw.rect(self.screen, color, load_rect)
         button_text = self.font.render("Load", True, (0, 0, 0))
         button_text_rect = button_text.get_rect(center=load_rect.center)
         self.screen.blit(button_text, button_text_rect)
