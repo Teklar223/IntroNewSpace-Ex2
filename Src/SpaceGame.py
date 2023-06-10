@@ -101,6 +101,7 @@ class SpaceGame:
         self.clear_screen()
         self.config = Configuration(**_config_zero())
         bg = pygame.image.load('Media/background.jpg').convert()
+        scaled_bg = pygame.transform.scale(bg, (self.screen.get_width(), self.screen.get_height()))
         input_boxes = []  # List to store the input boxes
 
         # Create input boxes for each configuration variable
@@ -113,15 +114,17 @@ class SpaceGame:
                 input_box = InputBox(x, y_offset, 200, 30, text=str(value), permatext=permatxt)
                 input_boxes.append(input_box)
                 y_offset += 40
-
-        title_surface = self.font.render("My In-Game Title", True, (255, 255, 255))
+        title_font = pygame.font.Font(None, 48)
+        title_surface = title_font.render("Space Simulation", True, (255, 255, 255))
         title_pos = (self.screen.get_width()/2,100)
         title_rect = title_surface.get_rect(center=title_pos)
 
-        start_button_rect = pygame.Rect(self.screen.get_width()/2, 200, 200, 100)  # Rect for the start button
+        start_button_rect = pygame.Rect(self.screen.get_width()/2, 250, 200, 100)  # Rect for the start button
         start_button_rect.center = (self.screen.get_width()/2,200)
-        simulation_button_rect = pygame.Rect(self.screen.get_width()/2, 300, 200, 100)  # Rect for the start button
+        simulation_button_rect = pygame.Rect(self.screen.get_width()/2, 400, 200, 100)  # Rect for the start button
         simulation_button_rect.center = (self.screen.get_width()/2,350)
+        explanation_button_rect = pygame.Rect(self.screen.get_width()/2, 400, 200, 100)  # Rect for the start button
+        explanation_button_rect.center = (self.screen.get_width()/2,500)
         
         save_config_rect = pygame.Rect(self.screen.get_width() - 200,y_offset,75,50)
         load_config_rect = pygame.Rect(self.screen.get_width() - 100,y_offset,75,50)
@@ -138,12 +141,13 @@ class SpaceGame:
                     input_box.handle_event(event, self.set_config)
 
             self.screen.fill((255, 255, 255))
-            self.screen.blit(bg, (0,0))
+            self.screen.blit(scaled_bg, (0,0))
             self.screen.blit(title_surface, title_rect)
 
             # Draw the start button
             self.draw_single_player(start_button_rect)
             self.draw_simulation(simulation_button_rect)
+            self.draw_explanation(explanation_button_rect)
             self.draw_save_and_load(save_rect= save_config_rect, load_rect= load_config_rect)
 
             # Render and blit configuration values
@@ -286,7 +290,13 @@ class SpaceGame:
 
     def draw_simulation(self, rect):
         pygame.draw.rect(self.screen, (0, 255, 0), rect)
-        button_text = self.font.render("Simulate", True, (0, 0, 0))
+        button_text = self.font.render("Replay", True, (0, 0, 0))
+        button_text_rect = button_text.get_rect(center=rect.center)
+        self.screen.blit(button_text, button_text_rect)
+
+    def draw_explanation(self, rect):
+        pygame.draw.rect(self.screen, (0, 255, 0), rect)
+        button_text = self.font.render("Explanation", True, (0, 0, 0))
         button_text_rect = button_text.get_rect(center=rect.center)
         self.screen.blit(button_text, button_text_rect)
 
