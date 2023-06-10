@@ -173,31 +173,35 @@ class SpaceGame:
                     continue
 
                 if simulation_button_rect.collidepoint(pygame.mouse.get_pos()):
-                    self.config.is_player = False
-                    input_boxes.clear()
-                    self.StartSim()
-                    running = False
+                    selected_file = self.select_file()
+                    if selected_file:
+                        self.config.is_player = False
+                        input_boxes.clear()
+                        self.startSim()
+                        running = False
 
                 if save_config_rect.collidepoint(pygame.mouse.get_pos()):
                     path = save()
-                    path = path +  ".csv"
-                    self.logger.log_csv([self.config],path = path, active = True, full_path=path)
+                    if path:
+                        path = path +  ".csv"
+                        self.logger.log_csv([self.config],path = path, active = True, full_path=path)
                 
                 if load_config_rect.collidepoint(pygame.mouse.get_pos()):
                     path = load()
-                    dict = self.load_csv_file(file_object=path)[0]
-                    self.config.update(**dict)
-                    input_boxes, y_offset = self.create_input_boxes(y_offset = 10)
+                    if path:
+                        dict = self.load_csv_file(file_object=path)[0]
+                        self.config.update(**dict)
+                        input_boxes, y_offset = self.create_input_boxes(y_offset = 10)
 
-    def StartSim(self):
+                if explanation_button_rect.collidepoint(pygame.mouse.get_pos()):
+                    input_boxes.clear()
+                    self.startExp()
+                    running = False
+
+    def startSim(self, selected_file):
         self.clear_screen()
-        selected_file = self.select_file()
         config_list = self.load_csv_file(file_object = selected_file)
         if config_list:
-            img_path = os.path.join(os.getcwd(), "Media")
-            img_path = os.path.join(img_path, "back_button.png")
-            img = pygame.image.load(img_path)
-            back_button = BackButton((10, 10), img)
             bg = pygame.image.load('Media/background.jpg').convert()
             arrow = pygame.image.load('Media/arrow.png')
 
@@ -235,13 +239,6 @@ class SpaceGame:
                             running = False
                             self.startMenu()  # return to main menu
 
-                    # Handle mouse events
-                    if event.type == MOUSEBUTTONDOWN:
-                        mouse_pos = pygame.mouse.get_pos()
-                        if back_button.is_clicked(mouse_pos):
-                            running = False
-                            self.startMenu()  # return to main menu
-
                 dt = 1 / self.clock.tick(60)
                 self.ship.config.update(**config_list[i])
                 i += 1
@@ -258,22 +255,39 @@ class SpaceGame:
                 self.render_config(self.ship.config)
                 self.render_ground(screen=self.screen)
                 self.screen.blit(self.ship.image, self.ship.rect)
-                back_button.draw(self.screen)
 
                 pygame.display.flip()
 
             self.EndGame(is_sim=True)
         else:
             return  # file not valid
+        
+    def startExp(self):
+        self.clear_screen()
+        bg = pygame.image.load('Media/background.jpg').convert()
+        scaled_bg = pygame.transform.scale(bg, (self.screen.get_width(), self.screen.get_height()))
+        running = True
+        while running:
+            for event in pygame.event.get():
+                if event.type == QUIT:
+                    pygame.quit()
+                    return
+                # Handle keyboard events
+                if event.type == KEYDOWN:
+                    if event.key == K_ESCAPE:
+                        running = False
+                    elif event.key == K_BACKSPACE:
+                        running = False
+                        self.startMenu()  # return to main menu
+
+            self.screen.blit(scaled_bg, (0,0))
+            pygame.display.flip()
 
     def load_csv_file(self, file_object):
+        if file_object is None:
+            return
         arr_of_dict = [{k: float(v) for k, v in row.items()} for row in csv.DictReader(file_object, skipinitialspace=True)]
         return arr_of_dict
-    
-    def load_json_file(self, file_object):
-        # TODO
-        dict = {}
-        return dict
     
     def select_file(self):
         file_path = load()
