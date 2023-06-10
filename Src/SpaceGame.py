@@ -1,6 +1,7 @@
 import csv
 import os
 import random
+import time
 from copy import deepcopy
 from Src.Util.SavePopUp import show_popup, run_popup
 from Src.Util.FileHandler import load, save
@@ -180,7 +181,7 @@ class SpaceGame:
                     if selected_file:
                         self.config.is_player = False
                         input_boxes.clear()
-                        self.startSim()
+                        self.startSim(selected_file)
                         running = False
 
                 if save_config_rect.collidepoint(pygame.mouse.get_pos()):
@@ -204,6 +205,8 @@ class SpaceGame:
                 if exit_button_rect.collidepoint(pygame.mouse.get_pos()):
                     input_boxes.clear()
                     running = False
+                    time.sleep(0.5)
+                    pygame.quit()
 
     def startSim(self, selected_file):
         self.clear_screen()
@@ -487,7 +490,6 @@ class SpaceGame:
         self.ship.rotate_ship()  # Rotate the ship to the correct angle to begin the simulation
         self.ship.set_first_position(self.screen.get_width(), self.screen.get_height())
         self.engine = Engine(self.config)
-        self.logger.log_csv([self.ship.config], active=self.config.is_player)  # once to log the starting condition
         # active is set this way becuase were reading from an existing CSV if were simulating
         running = True
         #create_dashboard(self.screen, self.screen.get_width(), self.screen.get_height())
@@ -518,11 +520,13 @@ class SpaceGame:
         self.EndGame(config_list=config_list)
 
     def EndGame(self, config_list: list = None, is_sim = False):
-        # TODO...
-        flag = self.check_victory()
-        running = True
+        victory = self.check_victory()
+        
+        msg = "Oh no, you crashed :("
+        if victory:
+            msg = "Successfully landed"
 
-        out = show_popup(config_list, show_save=not is_sim)
+        out = show_popup(config_list,msg=msg, show_save=not is_sim)
         if out:
             self.startMenu()
         else:

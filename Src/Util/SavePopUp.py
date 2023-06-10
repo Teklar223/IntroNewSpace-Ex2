@@ -18,7 +18,7 @@ BLACK = (0, 0, 0)
 yes_button = None
 no_button = None
 # Step 5: Create the popup function
-def show_popup(config_list: list, show_save = True) -> bool:
+def show_popup(config_list: list,msg, show_save = True) -> bool:
     global no_button
     global yes_button
     popup_width = 450
@@ -31,15 +31,15 @@ def show_popup(config_list: list, show_save = True) -> bool:
     pygame.draw.rect(popup_surface, BLACK, (0, 0, popup_width, popup_height), 3)
     font = pygame.font.Font(None, 24)
 
-    if show_save:
-        text = font.render("Do you want to save the file?", True, BLACK)
-        text_rect = text.get_rect(center=(popup_width // 2, popup_height // 2 - 20))
-        popup_surface.blit(text, text_rect)
+    text = font.render(msg, True, BLACK)
+    text_rect = text.get_rect(center=(popup_width // 2, popup_height // 2 - 20))
+    popup_surface.blit(text, text_rect)
 
-        yes_button = pygame.Rect(20, popup_height - 50, 100, 30)
+    if show_save:
+        yes_button = pygame.Rect(popup_width - 280, popup_height - 50, 100, 30)
         pygame.draw.rect(popup_surface, WHITE, yes_button)
         pygame.draw.rect(popup_surface, BLACK, yes_button, 2)
-        yes_text = font.render("Save", True, BLACK)
+        yes_text = font.render("Save log", True, BLACK)
         yes_text_rect = yes_text.get_rect(center=yes_button.center)
         popup_surface.blit(yes_text, yes_text_rect)
 
@@ -50,7 +50,7 @@ def show_popup(config_list: list, show_save = True) -> bool:
     no_text_rect = no_text.get_rect(center=no_button.center)
     popup_surface.blit(no_text, no_text_rect)
 
-    menu_button = pygame.Rect(popup_width - 280, popup_height - 50, 100, 30)
+    menu_button = pygame.Rect(20, popup_height - 50, 100, 30)
     pygame.draw.rect(popup_surface, WHITE, menu_button)
     pygame.draw.rect(popup_surface, BLACK, menu_button, 2)
     menu_text = font.render("Menu", True, BLACK)
@@ -117,9 +117,10 @@ def file_dialog(config_list: list):
     # Add your file save dialog code here
     # This is just a placeholder
     path = save()
-    logger = Logger()
-    logger.log_csv(configs=config_list, full_path=path)
-    print("File save dialog")
+    if path:
+        logger = Logger()
+        path = path + ".csv"
+        logger.log_csv(configs=config_list, full_path=path)
 
 
 # Step 8: Run the game loop
