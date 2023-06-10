@@ -267,6 +267,34 @@ class SpaceGame:
         bg = pygame.image.load('Media/background.jpg').convert()
         scaled_bg = pygame.transform.scale(bg, (self.screen.get_width(), self.screen.get_height()))
         running = True
+
+        # Game controls and goals paragraph
+        controls_text = '''
+        Controls:
+            - you control a ship that uses its engines thrust to generate accelration in a certain direction (defined by its angle) and thus increase its speed in that direction
+            - Up/Down arrows increase/decrease the engines thrust respectively.
+            - Left/Right arrows increase/decrease the angle respectively.
+            - Backspace to return to main menu
+            - W,A,S,D = UP,LEFT,DOWN,RIGHT arrows if you prefer that
+
+        \nDashboard:
+            - note: our y axis is pointed UP and x-axis is pointed RIGHT (like you have in school), that means that positive horizontal speed means speed to the right, and negative to the left
+            - similarly positive vertical speed means that the direction of it is UP, and a negative value means its direction is down
+            - you can set the ships starting horizontal speed, vertical speed, angle, fuel, and engines thrust 
+            - all the values are floats, and engine thrust should be between 0.0 and 1.0
+            - additionally you can see values called altitude and latitude, altitude is the distance from the ground, and latitude is the distance from your landing goal
+
+        \nGoals:
+            - primary objective : manage to land with vertical and horizontal speed close to 0 as possible (otherwise its a crash)
+            - optional objective: land with latitude close to 0 as possible
+        '''
+
+        font = pygame.font.Font(None, 30)
+        text_lines = controls_text.strip().split('\n')
+        line_height = font.get_linesize()
+        text_color = (75, 255, 75)
+
+        running = True
         while running:
             for event in pygame.event.get():
                 if event.type == QUIT:
@@ -280,7 +308,11 @@ class SpaceGame:
                         running = False
                         self.startMenu()  # return to main menu
 
-            self.screen.blit(scaled_bg, (0,0))
+            self.screen.blit(scaled_bg, (0, 0))
+            # Render and blit each line of text
+            for i, line in enumerate(text_lines):
+                text_surface = font.render(line, True, text_color)
+                self.screen.blit(text_surface, (20, 20 + i * line_height))
             pygame.display.flip()
 
     def load_csv_file(self, file_object):
@@ -445,7 +477,7 @@ class SpaceGame:
         self.logger.log_csv([self.ship.config], active=self.config.is_player)  # once to log the starting condition
         # active is set this way becuase were reading from an existing CSV if were simulating
         running = True
-        create_dashboard(self.screen, self.screen.get_width(), self.screen.get_height())
+        #create_dashboard(self.screen, self.screen.get_width(), self.screen.get_height())
         while running:
             dt = 1 / self.clock.tick(60)
             running = self._handle_events()
