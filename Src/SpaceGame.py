@@ -120,7 +120,7 @@ class SpaceGame:
         # Create input boxes for each configuration variable
         input_boxes, y_offset = self.create_input_boxes(y_offset = 10)
         title_font = pygame.font.Font(None, 56)
-        title_surface = title_font.render("Space Simulation", True, (255, 255, 255))
+        title_surface = title_font.render("Space Flight Simulation", True, (255, 255, 255))
         title_pos = (self.screen.get_width()/2,100)
         title_rect = title_surface.get_rect(center=title_pos)
 
@@ -130,6 +130,8 @@ class SpaceGame:
         simulation_button_rect.center = (self.screen.get_width()/2,350)
         explanation_button_rect = pygame.Rect(self.screen.get_width()/2, 400, 200, 100)  # Rect for the start button
         explanation_button_rect.center = (self.screen.get_width()/2,500)
+        exit_button_rect = pygame.Rect(self.screen.get_width()/2, 400, 200, 100)  # Rect for the start button
+        exit_button_rect.center = (self.screen.get_width()/2,650)
         
         save_config_rect = pygame.Rect(self.screen.get_width() - 200,y_offset,75,50)
         load_config_rect = pygame.Rect(self.screen.get_width() - 100,y_offset,75,50)
@@ -153,6 +155,7 @@ class SpaceGame:
             self.draw_single_player(start_button_rect)
             self.draw_simulation(simulation_button_rect)
             self.draw_explanation(explanation_button_rect)
+            self.draw_exit(exit_button_rect)
             self.draw_save_and_load(save_rect= save_config_rect, load_rect= load_config_rect)
 
             # Render and blit configuration values
@@ -196,6 +199,10 @@ class SpaceGame:
                 if explanation_button_rect.collidepoint(pygame.mouse.get_pos()):
                     input_boxes.clear()
                     self.startExp()
+                    running = False
+
+                if exit_button_rect.collidepoint(pygame.mouse.get_pos()):
+                    input_boxes.clear()
                     running = False
 
     def startSim(self, selected_file):
@@ -339,6 +346,12 @@ class SpaceGame:
     def draw_single_player(self, rect):
         pygame.draw.rect(self.screen, (0, 255, 0), rect)
         button_text = self.font.render("Single Player", True, (0, 0, 0))
+        button_text_rect = button_text.get_rect(center=rect.center)
+        self.screen.blit(button_text, button_text_rect)
+
+    def draw_exit(self, rect):
+        pygame.draw.rect(self.screen, (50, 175, 50), rect)
+        button_text = self.font.render("exit", True, (0, 0, 0))
         button_text_rect = button_text.get_rect(center=rect.center)
         self.screen.blit(button_text, button_text_rect)
 
