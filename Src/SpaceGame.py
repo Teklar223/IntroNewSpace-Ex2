@@ -69,9 +69,9 @@ class SpaceGame:
     This is the 'Controller' of our simulation
     '''
 
-    def __init__(self, width=800, height=600, ):
+    def __init__(self, width=800, height=600, fullscreen_flag = None):
         pygame.init()
-        self.screen = pygame.display.set_mode((width, height))
+        self.screen = pygame.display.set_mode((width, height),fullscreen_flag)
         self.clock = pygame.time.Clock()
         self.ship = None
         self.font = pygame.font.SysFont(None, 24)
@@ -100,7 +100,7 @@ class SpaceGame:
     def startMenu(self):
         self.clear_screen()
         self.config = Configuration(**_config_zero())
-        bg = pygame.image.load('Media/background.jpg') # .convert()
+        bg = pygame.image.load('Media/background.jpg').convert()
         input_boxes = []  # List to store the input boxes
 
         # Create input boxes for each configuration variable
@@ -113,6 +113,10 @@ class SpaceGame:
                 input_box = InputBox(x, y_offset, 200, 30, text=str(value), permatext=permatxt)
                 input_boxes.append(input_box)
                 y_offset += 40
+
+        title_surface = self.font.render("My In-Game Title", True, (255, 255, 255))
+        title_pos = (self.screen.get_width()/2,100)
+        title_rect = title_surface.get_rect(center=title_pos)
 
         start_button_rect = pygame.Rect(self.screen.get_width()/2, 200, 200, 100)  # Rect for the start button
         start_button_rect.center = (self.screen.get_width()/2,200)
@@ -135,6 +139,7 @@ class SpaceGame:
 
             self.screen.fill((255, 255, 255))
             self.screen.blit(bg, (0,0))
+            self.screen.blit(title_surface, title_rect)
 
             # Draw the start button
             self.draw_single_player(start_button_rect)
