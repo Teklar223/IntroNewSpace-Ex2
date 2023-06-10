@@ -93,6 +93,20 @@ class SpaceGame:
     def clear_screen(self, R=255, G=255, B=255):
         self.screen.fill((R, G, B))  # Fill the screen with black color
 
+    def create_input_boxes(self, y_offset):
+        input_boxes = []  # List to store the input boxes
+        for key, value in self.config.__dict__.items():
+            if key not in ["WEIGHT_EMP", "WEIGHT_FUEL", "WEIGHT_FULL", "MAIN_ENG_F", "SECOND_ENG_F", "MAIN_BURN",
+                           "SECOND_BURN", "ALL_BURN", "is_player","weight","time"]:
+                permatxt = f"{key}: "
+                x = self.screen.get_width() - 210
+                input_box = InputBox(x, y_offset, 200, 30, text=str(value), permatext=permatxt)
+                input_boxes.append(input_box)
+                y_offset += 40
+        
+        return input_boxes, y_offset
+
+
     def start(self):
         os.chdir("..")  # CWD is Src/Util when runtime raches this point (for some reason)
         self.startMenu()
@@ -102,18 +116,9 @@ class SpaceGame:
         self.config = Configuration(**_config_zero())
         bg = pygame.image.load('Media/background.jpg').convert()
         scaled_bg = pygame.transform.scale(bg, (self.screen.get_width(), self.screen.get_height()))
-        input_boxes = []  # List to store the input boxes
 
         # Create input boxes for each configuration variable
-        y_offset = 10
-        for key, value in self.config.__dict__.items():
-            if key not in ["WEIGHT_EMP", "WEIGHT_FUEL", "WEIGHT_FULL", "MAIN_ENG_F", "SECOND_ENG_F", "MAIN_BURN",
-                           "SECOND_BURN", "ALL_BURN", "is_player"]:
-                permatxt = f"{key}: "
-                x = self.screen.get_width() - 210
-                input_box = InputBox(x, y_offset, 200, 30, text=str(value), permatext=permatxt)
-                input_boxes.append(input_box)
-                y_offset += 40
+        input_boxes, y_offset = self.create_input_boxes(y_offset = 10)
         title_font = pygame.font.Font(None, 56)
         title_surface = title_font.render("Space Simulation", True, (255, 255, 255))
         title_pos = (self.screen.get_width()/2,100)
@@ -175,12 +180,14 @@ class SpaceGame:
 
                 if save_config_rect.collidepoint(pygame.mouse.get_pos()):
                     path = save()
-                    self.logger.log_csv([self.config],path = path, active = True)
+                    path = path +  ".csv"
+                    self.logger.log_csv([self.config],path = path, active = True, full_path=path)
                 
                 if load_config_rect.collidepoint(pygame.mouse.get_pos()):
                     path = load()
                     dict = self.load_csv_file(file_object=path)[0]
-                    self.config.update(dict)
+                    self.config.update(**dict)
+                    input_boxes, y_offset = self.create_input_boxes(y_offset = 10)
 
     def StartSim(self):
         self.clear_screen()
